@@ -5,7 +5,7 @@
         <div style="margin-bottom: 20px">
           <a-card style="width: 300px;">
             <div style="text-align: center">
-              <a-button  icon="plus" :size="large" block style="border: none">新增数据源</a-button>
+              <a-button @click="handleAdd" icon="plus" :size="large" block style="border: none">新增数据源</a-button>
             </div>
           </a-card>
         </div>
@@ -23,7 +23,7 @@
                   &nbsp;
                   <a-button type="danger" icon="delete" size="small">删除</a-button>
                 </div>
-              </div>t
+             </div>
             </a-card>
           </a-list-item>
         </a-list>
@@ -56,10 +56,15 @@
         </a-list>
       </a-tab-pane>
     </a-tabs>
+
+    <data-source-modal ref="modalForm" @ok="modalFormOk"></data-source-modal>
   </a-card>
 </template>
 
 <script>
+
+import DataSourceModal from './modules/DataSourceModal'
+import {JeecgListMixin} from '@/mixins/JeecgListMixin'
 
 const data = [
   {
@@ -113,7 +118,11 @@ const data = [
 ];
 
 export default {
-  name: 'index',
+  name: 'DataSourceList',
+  mixins: [JeecgListMixin],
+  components: {
+    DataSourceModal,
+  },
   data() {
     return {
       data
