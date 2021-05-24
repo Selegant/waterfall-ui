@@ -225,8 +225,8 @@ export const JeecgListMixin = {
       this.$refs.modalForm.title = "编辑";
       this.$refs.modalForm.disableSubmit = false;
     },
-    handleAdd: function () {
-      this.$refs.modalForm.add();
+    handleAdd: function (params) {
+      this.$refs.modalForm.add(params);
       this.$refs.modalForm.title = "新增";
       this.$refs.modalForm.disableSubmit = false;
     },

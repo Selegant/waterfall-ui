@@ -100,6 +100,14 @@ export const transitRESTful = {
   http: (url, parameter) => httpAction(getTransitURL(url), parameter),
 }
 
+// 数据源相关
+const getDataSourceList = (params)=>getAction("/datasource/list",params);
+const getDataSourceTypeList = (params)=>getAction("/datasource/type/list",params);
+const addDataSource = (params)=>postAction("/datasource/add",params);
+const editDataSource = (params)=>postAction("/datasource/update",params);
+const delDataSource = (params)=>postAction("/datasource/delete",params);
+const testDataSource = (params)=>postAction("/datasource/connection",params);
+
 export {
   // imgView,
   // doMian,
@@ -157,7 +165,14 @@ export {
   saveDeptRolePermission,
   queryMyDepartTreeList,
   getUserNoticeInfo,
-  getDictItemsFromCache
+  getDictItemsFromCache,
+  getDataSourceList,
+  addDataSource,
+  editDataSource,
+  delDataSource,
+  getDataSourceTypeList,
+  testDataSource
+
 }
 
 

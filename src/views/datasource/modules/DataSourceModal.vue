@@ -22,26 +22,59 @@
     <a-spin :spinning="confirmLoading">
       <a-form-model ref="form" :model="model" :rules="validatorRules">
 
-        <a-form-model-item label="数据源名称" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="dataSourceName">
-          <a-input placeholder="请输入数据源名称" v-model="model.dataSourceName" />
+        <a-form-model-item label="连接名称" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="dataSourceName">
+          <a-input placeholder="请输入连接名称" v-model="model.dataSourceName" />
         </a-form-model-item>
 
-        <a-form-model-item label="数据库类型" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="workNo">
-          <j-select-position placeholder="请选择职务" :multiple="false" v-model="model.post"/>
+        <a-form-model-item label="数据库类型" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="dbType">
+          <a-select placeholder="请选择数据库类型" v-model="model.dbType">
+            <a-select-option v-for="(item,index) in dataSourceTypeOptions" :key="index" :value="item.value">
+              {{item.name}}
+            </a-select-option>
+          </a-select>
         </a-form-model-item>
 
-        <template v-if="!model.id">
-          <a-form-model-item label="数据库连接地址" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="workNo">
-            <a-input placeholder="请输入数据库连接地址" v-model="model.workNo" />
+        <template>
+          <a-form-model-item label="Host" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="host">
+            <a-input placeholder="请输入数据库Host" v-model="model.host" />
           </a-form-model-item>
         </template>
 
-        <a-form-model-item label="用户名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="realname">
-          <a-input placeholder="请输入用户名" v-model="model.realname" />
+
+        <template>
+          <a-form-model-item label="Port" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="port">
+            <a-input placeholder="请输入数据库端口号" v-model="model.port"  />
+          </a-form-model-item>
+        </template>
+
+        <template>
+          <a-form-model-item v-if="model.dbType==ORACLE" label="服务名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="serverName">
+            <a-input placeholder="请输入数据库服务名" v-model="model.serverName"  />
+          </a-form-model-item>
+        </template>
+
+        <template>
+          <a-form-model-item v-if="model.dbType==MYSQL" label="Database" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="dbName">
+            <a-input placeholder="请输入数据库名" v-model="model.dbName"  />
+          </a-form-model-item>
+        </template>
+
+<!--        <template>-->
+<!--          <a-form-model-item label="JDBC_URL" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="jdbcUrl">-->
+<!--            <a-input placeholder="请输入数据库连接地址" v-model="model.jdbcUrl" @change="changeJdbcUrl" />-->
+<!--          </a-form-model-item>-->
+<!--        </template>-->
+
+        <a-form-model-item label="用户名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="username">
+          <a-input placeholder="请输入用户名" v-model="model.username" />
         </a-form-model-item>
 
         <a-form-model-item label="密码" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="password" >
           <a-input type="password" placeholder="请输入密码" v-model="model.password" />
+        </a-form-model-item>
+
+        <a-form-model-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input placeholder="请输入备注" v-model="model.remark" />
         </a-form-model-item>
 
 <!--        <a-form-model-item label="数据库名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="realname">-->
@@ -53,6 +86,7 @@
 
 
     <div class="drawer-bootom-button" v-show="!disableSubmit">
+      <a-button @click="connection" type="danger"  :loading="confirmLoading" style="margin-right: .8rem;">测试连接</a-button>
       <a-popconfirm title="确定放弃编辑？" @confirm="handleCancel" okText="确定" cancelText="取消">
         <a-button style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
@@ -66,16 +100,21 @@
   import Vue from 'vue'
   import { ACCESS_TOKEN } from "@/store/mutation-types"
   import { getAction } from '@/api/manage'
-  import { addUser,editUser,queryUserRole,queryall } from '@/api/api'
+  import { addDataSource,testDataSource,getDataSourceTypeList,editDataSource,queryUserRole,queryall } from '@/api/api'
   import { disabledAuthFilter } from "@/utils/authFilter"
   import { duplicateCheck } from '@/api/api'
 
+  const MYSQL='MySQL'
+  const ORACLE = 'Oracle'
+
   export default {
-    name: "UserModal",
+    name: "DataSourceModal",
     components: {
     },
     data () {
       return {
+        MYSQL,
+        ORACLE,
         departDisabled: false, //是否是我的部门调用该页面
         roleDisabled: false, //是否是角色维护调用该页面
         modalWidth:800,
@@ -88,17 +127,14 @@
         validatorRules:{
           dataSourceName:[{required: true, message: '请输入数据源名称!'},
                     {validator: this.validateDataSourceName,}],
-          password: [{required: true,pattern:/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>?,./]).{8,}$/,message: '密码由8位数字、大小写字母和特殊符号组成!'},
-                     {validator: this.validateToNextPassword,trigger: 'change'}],
-          confirmpassword: [{required: true, message: '请重新输入登录密码!',},
-                            { validator: this.compareToFirstPassword,}],
-          realname:[{ required: true, message: '请输入用户名称!' }],
-          phone: [{validator: this.validatePhone}],
-          email: [{validator: this.validateEmail}],
-          roles:{},
-          workNo:[ { required: true, message: '请输入工号' },
-                  { validator: this.validateWorkNo }],
-          telephone: [{ pattern: /^0\d{2,3}-[1-9]\d{6,7}$/, message: '请输入正确的座机号码' },]
+          dbType: [{required: true, message: '请输入数据库类型!'}],
+          jdbcUrl: [{required: true, message: '请重新输入数据库地址!'}],
+          host:[{ required: true, message: '请输入数据库Host!' }],
+          port: [{required: true, message: '请输入数据库端口号!'}],
+          dbName: [{required: true, message: '请输入数据库名!'}],
+          serverName: [{required: true, message: '请输入服务名!'}],
+          username:[{ required: true, message: '请输入用户名!' }],
+          password: [{required: true, message: '请输入密码!'}],
         },
         departIdShow:false,
         title:"操作",
@@ -115,23 +151,15 @@
         uploadLoading:false,
         confirmLoading: false,
         headers:{},
-        url: {
-          fileUpload: window._CONFIG['domianURL']+"/sys/common/upload",
-          userWithDepart: "/sys/user/userDepartList", // 引入为指定用户查看部门信息需要的url
-          userId:"/sys/user/generateUserId", // 引入生成添加用户情况下的url
-          syncUserByUserName:"/act/process/extActProcess/doSyncUserByUserName",//同步用户到工作流
-          queryTenantList: '/sys/tenant/queryList'
-        },
         tenantsOptions: [],
-        rolesOptions:[],
+        dataSourceTypeOptions:[],
         nextDepartOptions:[],
       }
     },
-    created () {
+    mounted () {
       const token = Vue.ls.get(ACCESS_TOKEN);
       this.headers = {"X-Access-Token":token}
-      this.initRoleList()
-      this.initTenantList()
+      this.initDataSourceTypeList()
     },
     computed:{
       uploadAction:function () {
@@ -139,9 +167,12 @@
       }
     },
     methods: {
-      add () {
+      add (params) {
+        // console.log(params)
+        // this.model.purpose = params.purpose
+        // console.log(this.model.purpose)
         this.refresh();
-        this.edit({activitiSync:'1',userIdentity:1});
+        this.edit({activitiSync:'1',userIdentity:1,purpose:params.purpose});
       },
       edit (record) {
         let that = this;
@@ -149,19 +180,23 @@
         //根据屏幕宽度自适应抽屉宽度
         this.resetScreenSize();
         that.userId = record.id;
+        if(!record.jdbcUrl){
+          record.jdbcUrl = ''
+        }
         that.model = Object.assign({},{selectedroles:'',selecteddeparts:''}, record);
-        //身份为上级显示负责部门，否则不显示
-        if(this.model.userIdentity==2){
-          this.departIdShow=true;
-        }else{
-          this.departIdShow=false;
-        }
-
-        if(record.hasOwnProperty("id")){
-          that.getUserRoles(record.id);
-          that.getUserDeparts(record.id);
-        }
-        console.log('that.model=',that.model)
+        // that.model.jdbcUrl = '12345'
+        // //身份为上级显示负责部门，否则不显示
+        // if(this.model.userIdentity==2){
+        //   this.departIdShow=true;
+        // }else{
+        //   this.departIdShow=false;
+        // }
+        //
+        // if(record.hasOwnProperty("id")){
+        //   that.getUserRoles(record.id);
+        //   that.getUserDeparts(record.id);
+        // }
+        // console.log('that.model=',that.model)
       },
       isDisabledAuth(code){
         return disabledAuthFilter(code);
@@ -184,63 +219,66 @@
           this.drawerWidth = 700;
         }
       },
-      //初始化租户字典
-      initTenantList(){
-        getAction(this.url.queryTenantList).then(res=>{
+      //初始化数据库类型列表
+      initDataSourceTypeList(){
+        getDataSourceTypeList().then((res)=>{
           if(res.success){
-            this.tenantsOptions = res.result.map((item,index,arr)=>{
-              let c = {label:item.name, value: item.id+""}
+            this.dataSourceTypeOptions = res.result.map((item,index,arr)=>{
+              let c = {name:item.dbType, value:item.dbType}
               return c;
             })
-            console.log('this.tenantsOptions: ',this.tenantsOptions)
+            console.log('this.dataSourceTypeOptions: ',this.dataSourceTypeOptions)
+          }
+        });
+      },
+      changeType(e){
+        const that = this
+        this.dataSourceTypeOptions.forEach(function (item) {
+          console.log(item.value)
+          if(item.value === e){
+            that.model.initUrl = item.url
+            that.model.jdbcUrl = that.model.initUrl.concat(!that.model.host?'':that.model.host,':',!that.model.port?'':that.model.port,'/')
           }
         })
       },
-      //初始化角色字典
-      initRoleList(){
-        queryall().then((res)=>{
-          if(res.success){
-            this.rolesOptions = res.result.map((item,index,arr)=>{
-              let c = {label:item.roleName, value:item.id}
-              return c;
-            })
-            console.log('this.rolesOptions: ',this.rolesOptions)
-          }
-        });
-      },
-      getUserRoles(userid){
-        queryUserRole({userid:userid}).then((res)=>{
-          if(res.success){
-            this.model.selectedroles = res.result.join(",");
-            console.log('that.model.selectedroles=',this.model.selectedroles)
-          }
-        });
-      },
-      getUserDeparts(userid){
-        let that = this;
-        getAction(that.url.userWithDepart,{userId:userid}).then((res)=>{
-          if(res.success){
-            let departOptions=[];
-            let selectDepartKeys=[]
-            for (let i = 0; i < res.result.length; i++) {
-              selectDepartKeys.push(res.result[i].key);
-              //新增负责部门选择下拉框
-              departOptions.push({
-                value: res.result[i].key,
-                label: res.result[i].title
-              })
+      updateJdbcUrl(){
+        const that = this
+        if(!this.model.initUrl){
+          this.dataSourceTypeOptions.forEach(function (item) {
+            console.log(item.value)
+            if(item.value === that.model.typeId){
+              that.model.initUrl = item.url
+              that.model.jdbcUrl = that.model.initUrl.concat(!that.model.host?'':that.model.host,':',!that.model.port?'':that.model.port,'/')
             }
-            that.model.selecteddeparts = selectDepartKeys.join(",")
-            that.nextDepartOptions=departOptions;
-            console.log('that.nextDepartOptions=',that.nextDepartOptions)
-          }
-        })
+          })
+        }else {
+          this.model.jdbcUrl = this.model.initUrl.concat(!this.model.host?'':this.model.host,':',!this.model.port?'':this.model.port,'/')
+        }
       },
-      backDepartInfo(info) {
-        this.model.departIds = this.model.selecteddeparts;
-        this.nextDepartOptions = info.map((item,index,arr)=>{
-          let c = {label:item.text, value: item.value+""}
-          return c;
+      changeJdbcUrl(e){
+        // console.log(this.model.jdbcUrl.concat(e.data))
+        // this.model.jdbcUrl = this.model.jdbcUrl.concat(e.data)
+        console.log(e)
+        console.log(this.model.jdbcUrl)
+      },
+      connection(){
+        const that = this;
+        console.log(that.model)
+        this.$refs.form.validate(valid => {
+          if (valid) {
+            that.confirmLoading = true;
+            testDataSource(that.model).then((res)=>{
+              that.confirmLoading = false;
+              if(res.success){
+                that.$message.success('连接成功');
+                // console.log(res.success)
+              }else {
+                that.$message.error(res.message);
+              }
+            });
+          }else {
+            return false;
+          }
         })
       },
       refresh () {
@@ -263,23 +301,18 @@
         this.$refs.form.validate(valid => {
           if (valid) {
             that.confirmLoading = true;
-            //如果是上级择传入departIds,否则为空
-            if(this.model.userIdentity!==2){
-              this.model.departIds="";
-            }
             let obj;
             if(!this.model.id){
-              this.model.id = this.userId;
-              obj=addUser(this.model);
+              obj=addDataSource(this.model);
             }else{
-              obj=editUser(this.model);
+              obj=editDataSource(this.model);
             }
             obj.then((res)=>{
               if(res.success){
                 that.$message.success(res.message);
                 that.$emit('ok');
               }else{
-                that.$message.warning(res.message);
+                that.$message.error(res.message);
               }
             }).finally(() => {
               that.confirmLoading = false;
@@ -292,70 +325,6 @@
       },
       handleCancel () {
         this.close()
-      },
-      validateToNextPassword (rule, value, callback) {
-        const confirmpassword=this.model.confirmpassword;
-        if (value && confirmpassword && value !== confirmpassword) {
-          callback('两次输入的密码不一样！');
-        }
-        if (value && this.confirmDirty) {
-          this.$refs.form.validateField(['confirmpassword']);
-        }
-        callback();
-      },
-      compareToFirstPassword (rule, value, callback) {
-        if (value && value !== this.model.password) {
-          callback('两次输入的密码不一样！');
-        } else {
-          callback()
-        }
-      },
-      validatePhone(rule, value, callback){
-        if(!value){
-          callback()
-        }else{
-          if(new RegExp(/^1[3|4|5|7|8|9][0-9]\d{8}$/).test(value)){
-            var params = {
-              tableName: 'sys_user',
-              fieldName: 'phone',
-              fieldVal: value,
-              dataId: this.userId
-            };
-            duplicateCheck(params).then((res) => {
-              if (res.success) {
-                callback()
-              } else {
-                callback("手机号已存在!")
-              }
-            })
-          }else{
-            callback("请输入正确格式的手机号码!");
-          }
-        }
-      },
-      validateEmail(rule, value, callback){
-        if(!value){
-          callback()
-        }else{
-          if(new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(value)){
-            var params = {
-              tableName: 'sys_user',
-              fieldName: 'email',
-              fieldVal: value,
-              dataId: this.userId
-            };
-            duplicateCheck(params).then((res) => {
-              console.log(res)
-              if (res.success) {
-                callback()
-              } else {
-                callback("邮箱已存在!")
-              }
-            })
-          }else{
-            callback("请输入正确格式的邮箱!")
-          }
-        }
       },
       validateDataSourceName(rule, value, callback){
         var params = {
@@ -371,40 +340,6 @@
           callback("数据源名称已存在!")
         }
       })
-      },
-      validateWorkNo(rule, value, callback){
-        var params = {
-          tableName: 'sys_user',
-          fieldName: 'work_no',
-          fieldVal: value,
-          dataId: this.userId
-        };
-        duplicateCheck(params).then((res) => {
-          if (res.success) {
-            callback()
-          } else {
-            callback("工号已存在!")
-          }
-        })
-      },
-      handleConfirmBlur(e) {
-        const value = e.target.value;
-        this.confirmDirty = this.confirmDirty || !!value
-      },
-      beforeUpload: function(file){
-        var fileType = file.type;
-        if(fileType.indexOf('image')<0){
-          this.$message.warning('请上传图片');
-          return false;
-        }
-        //TODO 验证文件大小
-      },
-      identityChange(e){
-        if(e.target.value===1){
-            this.departIdShow=false;
-        }else{
-            this.departIdShow=true;
-        }
       }
     }
   }
