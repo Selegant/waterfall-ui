@@ -1,0 +1,63 @@
+@font-face {
+  font-family: "action-jeecg"; /* Project id 2581982 */
+  src: url('iconfont.woff2?t=1622447708503') format('woff2'),
+       url('iconfont.woff?t=1622447708503') format('woff'),
+       url('iconfont.ttf?t=1622447708503') format('truetype');
+}
+
+.action-jeecg {
+  font-family: "action-jeecg" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.actionhive1:before {
+  content: "\e682";
+}
+
+.actionhive-2:before {
+  content: "\e603";
+}
+
+.actionhive2:before {
+  content: "\e62b";
+}
+
+.actionHive:before {
+  content: "\e62e";
+}
+
+.actionhive:before {
+  content: "\e6f2";
+}
+
+.actionround-pageview-px:before {
+  content: "\e6e6";
+}
+
+.actiontable_view-24px1:before {
+  content: "\e601";
+}
+
+.actiontable_view:before {
+  content: "\e602";
+}
+
+.actiontable_viewer_old:before {
+  content: "\e65e";
+}
+
+.actiontable:before {
+  content: "\e660";
+}
+
+.actionconnection-Oracle:before {
+  content: "\e600";
+}
+
+.actionmy-SQL:before {
+  content: "\e63b";
+}
+

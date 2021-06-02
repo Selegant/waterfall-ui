@@ -8,6 +8,10 @@
 <script>
   import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
   import enquireScreen from '@/utils/device'
+  // Fontclass模式
+  import '@/components/iconfont/common.less'
+  // 使用 symbol模式 支持多色
+  import '@/components/iconfont/iconfont.js'
 
   export default {
     data () {

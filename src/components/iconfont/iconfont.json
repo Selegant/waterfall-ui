@@ -1,0 +1,93 @@
+{
+  "id": "2581982",
+  "name": "waterfall",
+  "font_family": "action-jeecg",
+  "css_prefix_text": "action",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "17086381",
+      "name": "hive",
+      "font_class": "hive1",
+      "unicode": "e682",
+      "unicode_decimal": 59010
+    },
+    {
+      "icon_id": "17941239",
+      "name": "hive",
+      "font_class": "hive-2",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "19291170",
+      "name": "hive",
+      "font_class": "hive2",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "20754875",
+      "name": "Hive",
+      "font_class": "Hive",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
+      "icon_id": "8691929",
+      "name": "hive",
+      "font_class": "hive",
+      "unicode": "e6f2",
+      "unicode_decimal": 59122
+    },
+    {
+      "icon_id": "7371998",
+      "name": "round-pageview-24px",
+      "font_class": "round-pageview-px",
+      "unicode": "e6e6",
+      "unicode_decimal": 59110
+    },
+    {
+      "icon_id": "18375248",
+      "name": "table_view",
+      "font_class": "table_view-24px1",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "20068143",
+      "name": "table_view",
+      "font_class": "table_view",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "21208820",
+      "name": "table_viewer_old",
+      "font_class": "table_viewer_old",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "4308807",
+      "name": "table",
+      "font_class": "table",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "18424514",
+      "name": "oracle",
+      "font_class": "connection-Oracle",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "19505371",
+      "name": "my-SQL",
+      "font_class": "my-SQL",
+      "unicode": "e63b",
+      "unicode_decimal": 58939
+    }
+  ]
+}

@@ -107,6 +107,12 @@ const addDataSource = (params)=>postAction("/datasource/add",params);
 const editDataSource = (params)=>postAction("/datasource/update",params);
 const delDataSource = (params)=>postAction("/datasource/delete",params);
 const testDataSource = (params)=>postAction("/datasource/connection",params);
+const getDataSourceTreeList = (params)=>getAction("/datasource/tree/list",params);
+const getDataSourceTables = (params)=>getAction("/datasource/getTables/"+params);
+const getAmountList = (params)=>getAction("/datasource/amountList/"+params);
+const asyncAmount = (params)=>getAction("/datasource/asyncAmount/"+params);
+
+
 
 export {
   // imgView,
@@ -167,12 +173,15 @@ export {
   getUserNoticeInfo,
   getDictItemsFromCache,
   getDataSourceList,
+  getDataSourceTreeList,
   addDataSource,
   editDataSource,
   delDataSource,
   getDataSourceTypeList,
-  testDataSource
-
+  testDataSource,
+  getDataSourceTables,
+  getAmountList,
+  asyncAmount
 }
 
 
