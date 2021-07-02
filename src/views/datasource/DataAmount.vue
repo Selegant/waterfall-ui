@@ -1,22 +1,9 @@
 <template>
   <a-card :bordered="false" class="card-area" style="height: 80%">
     <a-tabs default-active-key="1" @change="callback" tab-position="top">
-      <a-tab-pane key="1" tab="数据端">
+      <a-tab-pane v-for="(index,item) in TABS" :key="item+1" :tab="`${index}`" force-render>
         <div style="display: flex;">
           <div style="margin-bottom: 20px;width: 200px;border-right: #E7E7E7 2px solid">
-<!--            <a-menu style="width: 256px"-->
-<!--                    mode="inline" @click="">-->
-<!--              <a-menu-item v-for="(item,index) in data" :key="item.id" :value="item.id">-->
-<!--                &lt;!&ndash;              <a-icon type="calendar" />&ndash;&gt;-->
-<!--                <a-tag v-if="item.dbType==MYSQL" color="#2db7f5">-->
-<!--                  <div style="width: 40px">{{ item.dbType }}</div>-->
-<!--                </a-tag>-->
-<!--                <a-tag v-if="item.dbType==ORACLE" color="#f50">-->
-<!--                  <div style="width: 40px">{{ item.dbType }}</div>-->
-<!--                </a-tag>-->
-<!--                {{ item.dataSourceName }}-->
-<!--              </a-menu-item>-->
-<!--            </a-menu>-->
             <a-tree :tree-data="treeData" show-icon default-expand-all @select="getTablesAndViews">
               <div slot="MySQL">
                 <i class="action-jeecg actionmy-SQL" style="color: #00A0E9;margin-right: 10px;" />
@@ -40,7 +27,7 @@
             </div>
             <div>
               <s-table
-                ref="table"
+                :ref="`table${item+1}`"
                 size="default"
                 :columns="columns"
                 :data="loadData"
@@ -52,26 +39,9 @@
           </div>
         </div>
       </a-tab-pane>
-
-
-      <a-tab-pane key="2" tab="目标端" force-render>
-<!--        <div style="margin-bottom: 20px">-->
-<!--          <a-menu style="width: 256px"-->
-<!--                  mode="inline" @click="">-->
-<!--            <a-menu-item v-for="(item,index) in data" :key="item.id" :value="item.id">-->
-<!--              &lt;!&ndash;              <a-icon type="calendar" />&ndash;&gt;-->
-<!--              <a-tag v-if="item.dbType==MYSQL" color="#2db7f5">-->
-<!--                <div style="width: 40px">{{ item.dbType }}</div>-->
-<!--              </a-tag>-->
-<!--              <a-tag v-if="item.dbType==ORACLE" color="#f50">-->
-<!--                <div style="width: 40px">{{ item.dbType }}</div>-->
-<!--              </a-tag>-->
-<!--              {{ item.dataSourceName }}-->
-<!--            </a-menu-item>-->
-<!--          </a-menu>-->
-<!--        </div>-->
-      </a-tab-pane>
     </a-tabs>
+
+
 
     <data-source-modal ref="modalForm" @ok="init"></data-source-modal>
   </a-card>
@@ -87,6 +57,8 @@ import { getServiceList } from '@/api/manage'
 const MYSQL = 'MySQL'
 const ORACLE = 'Oracle'
 
+const TABS = ['数据端','目标端']
+
 export default {
   name: 'DataAmount',
   // mixins: [JeecgListMixin],
@@ -98,10 +70,13 @@ export default {
     return {
       MYSQL,
       ORACLE,
+      TABS,
       params: {
         'purpose': 1,
-        'id': '-1'
+        'id': '-1',
+        'type': '1'
       },
+      isLeaf: false,
       syncLoading: false,
       treeData: [],
       columns: [
@@ -129,7 +104,7 @@ export default {
         }
       ],
       loadData: parameter => {
-        return getAmountList(this.params.id)
+        return getAmountList(this.params.id,this.params.type)
           .then(res => {
             console.log(res.result)
             return res.result
@@ -150,6 +125,7 @@ export default {
       })
     },
     init() {
+      console.log(TABS[0].name)
       getDataSourceTreeList({ 'purpose': this.params.purpose }).then((res) => {
         if (res.success) {
           this.treeData = res.result.trees
@@ -166,16 +142,27 @@ export default {
       })
     },
     getTablesAndViews(e){
-      console.log(e[0])
-      this.params.id = e[0].substring('-')[0];
-      this.$refs.table.refresh()
+      console.log(`table${this.params.purpose}`)
+      if(e[0].indexOf('-')===-1){
+        this.isLeaf = false
+        return
+      }
+      this.isLeaf = true
+      this.params.id = e[0].split('-')[0];
+      this.params.type = e[0].split('-')[1];
+      this.$refs[`table${this.params.purpose}`][0].refresh()
     },
     asyncUpdateAmount(){
+      if(!this.isLeaf){
+        this.$message.warning('请选择具体的数据源所对应的表和视图！')
+        return
+      }
       this.syncLoading = true
-      asyncAmount(this.params.id)
+      const that = this
+      asyncAmount(this.params.id,this.params.type)
         .then(res => {
-          this.syncLoading = false
-          this.$refs.table.refresh()
+          that.syncLoading = false
+          that.$refs[`table${this.params.purpose}`][0].refresh()
           return res.result
         })
     }

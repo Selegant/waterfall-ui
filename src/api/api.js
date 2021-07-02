@@ -109,11 +109,13 @@ const delDataSource = (params)=>postAction("/datasource/delete",params);
 const testDataSource = (params)=>postAction("/datasource/connection",params);
 const getDataSourceTreeList = (params)=>getAction("/datasource/tree/list",params);
 const getDataSourceTables = (params)=>getAction("/datasource/getTables/"+params);
-const getAmountList = (params)=>getAction("/datasource/amountList/"+params);
-const asyncAmount = (params)=>getAction("/datasource/asyncAmount/"+params);
+const getAmountList = (id,type)=>getAction("/datasource/amountList/"+id+"/"+type);
+const asyncAmount = (id,type)=>getAction("/datasource/asyncAmount/"+id+"/"+type);
+const getTableColumns = (params)=>postAction("/datasource/getTableColumns",params);
 
-
-
+// 离线任务
+const saveOfflineTask = (params)=>postAction("/offlineTask/saveOfflineTask",params);
+const getOfflineTaskList = (params)=>getAction("/offlineTask/list",params);
 export {
   // imgView,
   // doMian,
@@ -181,7 +183,10 @@ export {
   testDataSource,
   getDataSourceTables,
   getAmountList,
-  asyncAmount
+  asyncAmount,
+  getTableColumns,
+  saveOfflineTask,
+  getOfflineTaskList
 }
 
 
