@@ -1,53 +1,96 @@
 <template>
   <div>
     <a-card :bordered="false" class="card-area" style="height: 80%">
-      <a-tabs default-active-key="1" @change="callback" tab-position="left" v-show="showList">
-        <a-tab-pane v-for="(index,item) in TABS" :key="`${item+1}`" :tab="`${index}`" force-render>
-          <div style="display: flex;">
-            <div style="width: 1500px;">
-              <div style="margin-bottom: 20px;">
-                <a-row type="flex">
-                  <a-col>
-                    <a-button icon="plus" type="primary" @click="addOfflineTask">新增任务</a-button>
-                  </a-col>
-                  <a-col>
-                    <a-input-search :allowClear="true" v-model="queryParam.queryParam" placeholder="输入任务名或表名搜索" style="margin-left: 30px;width: 300px" @search="searchTaskList"></a-input-search>
-                  </a-col>
-                </a-row>
-              </div>
-              <div>
-                <s-table
-                  :ref="`table${item+1}`"
-                  size="default"
-                  :columns="columns"
-                  :data="loadData"
-                  bordered
-                  :pagination="true"
-                  v-if="params.purpose===1"
-                >
-                  <span slot="collectionType" slot-scope="collectionType">
-                    <template>
-                      <div style="text-align: center">
-                        <a-tag v-if="collectionType===1" color="#2db7f5">全量</a-tag>
-                        <a-tag v-if="collectionType===2" color="#87d068">增量</a-tag>
-                      </div>
-                    </template>
-                  </span>
-                  <span slot="action" slot-scope="record">
-                    <template>
-                      <a-button type="primary" size="small" icon="form" >编辑</a-button>
-                      <a-divider type="vertical"/>
-                      <a-button type="danger" size="small" icon="delete">删除</a-button>
-                    </template>
-                  </span>
-                </s-table>
-              </div>
-            </div>
-          </div>
+<!--      <a-tabs default-active-key="1" @change="callback" tab-position="left" v-show="showList">-->
+<!--        <a-tab-pane v-for="(index,item) in TABS" :key="`${item+1}`" :tab="`${index}`" force-render>-->
+<!--          <div style="display: flex;">-->
+<!--            <div style="width: 1500px;">-->
+<!--              <div style="margin-bottom: 20px;">-->
+<!--                <a-row type="flex">-->
+<!--                  <a-col>-->
+<!--                    <a-button icon="plus" type="primary" @click="addOfflineTask">新增离线任务</a-button>-->
+<!--                  </a-col>-->
+<!--                  <a-col>-->
+<!--                    <a-input-search :allowClear="true" v-model="queryParam.queryParam" placeholder="输入任务名或表名搜索" style="margin-left: 30px;width: 300px" @search="searchTaskList"></a-input-search>-->
+<!--                  </a-col>-->
+<!--                </a-row>-->
+<!--              </div>-->
+<!--              <div>-->
+<!--                <s-table-->
+<!--                  :ref="`table${item+1}`"-->
+<!--                  rowKey="id"-->
+<!--                  size="default"-->
+<!--                  :columns="columns"-->
+<!--                  :data="loadData"-->
+<!--                  bordered-->
+<!--                  showPagination="auto"-->
+<!--                  v-if="params.purpose===1"-->
+<!--                  :alert="options.alert"-->
+<!--                  :rowSelection="options.rowSelection"-->
+<!--                >-->
+<!--                  <span slot="collectionType" slot-scope="collectionType">-->
+<!--                    <template>-->
+<!--                      <div style="">-->
+<!--                        <a-tag v-if="collectionType===0" color="#2db7f5">全量</a-tag>-->
+<!--                        <a-tag v-if="collectionType===1" color="#87d068">增量</a-tag>-->
+<!--                      </div>-->
+<!--                    </template>-->
+<!--                  </span>-->
+<!--                  <span slot="triggerStatus" slot-scope="triggerStatus">-->
+<!--                    <template>-->
+<!--                      <div style="">-->
+<!--                        <a-tag v-if="triggerStatus===0" color="#f50">停止</a-tag>-->
+<!--                        <a-tag v-if="triggerStatus===1" color="#87d068">运行</a-tag>-->
+<!--                      </div>-->
+<!--                    </template>-->
+<!--                  </span>-->
+<!--                  <span slot="action" slot-scope="record">-->
+<!--                    <template>-->
+<!--                      <a-dropdown>-->
+<!--                        <a-menu slot="overlay">-->
+<!--                          <a-menu-item @click="$refs.executeForm.execute(record)">执行一次</a-menu-item>-->
+<!--                          <a-menu-item>-->
+<!--                            <router-link :to="{ name: 'LogManagement', query:{jobId:record.id,jobType:record.objectType}}">-->
+<!--                              <span>查询日志</span>-->
+<!--                            </router-link>-->
+<!--                          </a-menu-item>-->
+<!--                          <a-menu-item>-->
+<!--                            <router-link-->
+<!--                              :to="{ name: 'LogManagement', query:{jobId:record.id,logStatus:2,jobType:record.objectType}}">-->
+<!--                              <span style="color: red">查询错误日志</span>-->
+<!--                            </router-link>-->
+<!--                          </a-menu-item>-->
+<!--&lt;!&ndash;                          <a-menu-item>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <router-link :to="{ name: 'GroupManagement', query:{id:record.jobGroup} }">&ndash;&gt;-->
+<!--&lt;!&ndash;                              <span>注册节点</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                            </router-link>&ndash;&gt;-->
+<!--&lt;!&ndash;                          </a-menu-item>&ndash;&gt;-->
+<!--                          <a-menu-item @click="getNextTriggerTime(record)">下次执行时间</a-menu-item>-->
+<!--                          <a-menu-item v-if="record.triggerStatus===0" @click="startTask(record)">启动</a-menu-item>-->
+<!--                          <a-menu-item v-if="record.triggerStatus===1" @click="stopTask(record)">停止</a-menu-item>-->
+<!--                          <a-menu-item @click="$refs.taskEditForm.edit(record,jobGroupList,cronList)">编辑</a-menu-item>-->
+<!--                          <a-menu-item @click="deleteTask(record)">删除</a-menu-item>-->
+<!--                        </a-menu>-->
+<!--                        <a-button> 操作 <a-icon type="down"/> </a-button>-->
+<!--                      </a-dropdown>-->
+<!--                    </template>-->
+<!--                  </span>-->
+<!--                </s-table>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </a-tab-pane>-->
+<!--      </a-tabs>-->
+
+<!--      <add-offline-task ref="add" v-show="showAdd" @close="closeOfflineTask"></add-offline-task>-->
+      <a-tabs defaultActiveKey="1" tab-position="left">
+        <a-tab-pane tab="离线任务" key="1">
+          <offline-task-list ref="OfflineTaskList"></offline-task-list>
+        </a-tab-pane>
+        <a-tab-pane tab="实时任务" key="2" forceRender>
+          <online-task-list ref="OnlineTaskList"></online-task-list>
         </a-tab-pane>
       </a-tabs>
-
-      <add-offline-task ref="add" v-show="showAdd" @close="closeOfflineTask"></add-offline-task>
     </a-card>
 
   </div>
@@ -58,6 +101,8 @@ import STable from '@/components/table/'
 import { getDataSourceTreeList, getDataSourceTables, getAmountList, asyncAmount, getOfflineTaskList } from '@/api/api'
 import DataSourceModal from '../datasource/modules/DataSourceModal'
 import AddOfflineTask from './modules/AddOfflineTask'
+import OfflineTaskList from './OfflineTaskList'
+import OnlineTaskList from './OnlineTaskList'
 
 const MYSQL = 'MySQL'
 const ORACLE = 'Oracle'
@@ -69,7 +114,9 @@ export default {
   components: {
     DataSourceModal,
     STable,
-    AddOfflineTask
+    AddOfflineTask,
+    OfflineTaskList,
+    OnlineTaskList
   },
   data() {
     return {
@@ -108,22 +155,28 @@ export default {
           dataIndex: 'collectionType',
           scopedSlots: { customRender: 'collectionType' }
         },
-        {
-          title: '更新时间',
-          dataIndex: 'updateTime'
-        },
+        // {
+        //   title: '更新时间',
+        //   dataIndex: 'updateTime'
+        // },
         {
           title: '状态',
-          dataIndex: 'dbType'
+          dataIndex: 'triggerStatus',
+          scopedSlots: { customRender: 'triggerStatus' }
         },
         {
           title: '上次运行时间',
-          dataIndex: 'createTime',
+          dataIndex: 'triggerLastTime',
+        },
+        {
+          title: '下次运行时间',
+          dataIndex: 'triggerNextTime',
         },
         {
           title: '操作',
           // dataIndex: 'action',
-          width: '250px',
+          width: '100px',
+          fixed: 'right',
           scopedSlots: { customRender: 'action' }
         }
       ],
@@ -134,10 +187,24 @@ export default {
             // console.log(res.result)
             return res.result
           })
-      }
+      },
+      selectedRowKeys: [],
+      selectedRows: [],
+
+      // custom table alert & rowSelection
+      options: {
+        alert: { show: true, clear: () => { this.selectedRowKeys = [] } },
+        rowSelection: {
+          selectedRowKeys: this.selectedRowKeys,
+          onChange: this.onSelectChange
+        }
+      },
+      optionAlertShow: false,
+      nextTriggerTimeShow: false
     }
   },
   created() {
+    this.tableOption()
     this.init()
   },
   methods: {
@@ -182,6 +249,34 @@ export default {
     },
     searchTaskList(){
       this.$refs[`table${this.params.purpose}`][0].refresh()
+    },
+    tableOption () {
+      if (!this.optionAlertShow) {
+        this.options = {
+          alert: { show: true, clear: () => { this.selectedRowKeys = [] } },
+          rowSelection: {
+            selectedRowKeys: this.selectedRowKeys,
+            onChange: this.onSelectChange,
+            getCheckboxProps: record => ({
+              props: {
+                disabled: record.no === 'No 2', // Column configuration not to be checked
+                name: record.no
+              }
+            })
+          }
+        }
+        this.optionAlertShow = true
+      } else {
+        this.options = {
+          alert: false,
+          rowSelection: null
+        }
+        this.optionAlertShow = false
+      }
+    },
+    onSelectChange (selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys
+      this.selectedRows = selectedRows
     }
   }
 }
