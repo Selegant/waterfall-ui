@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1126",
+      "name": "文件夹",
+      "font_class": "wenjianjia",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "3853532",
+      "name": "文件夹",
+      "font_class": "-",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "12095308",
+      "name": "文件夹",
+      "font_class": "wenjianjia1",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "12095309",
+      "name": "文件夹_开",
+      "font_class": "wenjianjia_kai",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
+      "icon_id": "19644769",
+      "name": "文件夹",
+      "font_class": "wenjianjia2",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "22237944",
+      "name": "新增文件夹-icon",
+      "font_class": "xinzengwenjianjia-icon",
+      "unicode": "e694",
+      "unicode_decimal": 59028
+    },
+    {
       "icon_id": "17086381",
       "name": "hive",
       "font_class": "hive1",

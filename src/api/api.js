@@ -116,6 +116,8 @@ const getTableColumns = (params)=>postAction("/datasource/getTableColumns",param
 // 离线任务
 const saveOfflineTask = (params)=>postAction("/offlineTask/saveOfflineTask",params);
 const getOfflineTaskList = (params)=>getAction("/offlineTask/list",params);
+
+const triggerOfflineTask = (params)=>postAction("/offlineTask/trigger",params);
 export {
   // imgView,
   // doMian,
@@ -186,7 +188,8 @@ export {
   asyncAmount,
   getTableColumns,
   saveOfflineTask,
-  getOfflineTaskList
+  getOfflineTaskList,
+  triggerOfflineTask
 }
 
 

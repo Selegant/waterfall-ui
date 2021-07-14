@@ -73,7 +73,7 @@
                 </a>
                 <a-menu slot="overlay">
                    <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">执行一次</a>
+                    <a href="javascript:;" @click="triggerTask(record)">执行一次</a>
                   </a-menu-item>
                   <a-menu-item>
                     <a href="javascript:;" @click="handleDetail(record)">开启</a>
@@ -108,6 +108,7 @@ import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 import { getAction } from '@/api/manage'
 import AddOfflineTask from './modules/AddOfflineTask'
 import moment from 'moment'
+import { triggerOfflineTask } from '@/api/api'
 
 export default {
   name: 'OfflineTaskList',
@@ -210,6 +211,14 @@ export default {
       // this.showList = true
       this.$refs[`table${this.params.purpose}`][0].refresh()
     },
+    triggerTask(record){
+      const that = this
+      triggerOfflineTask({ 'jobId':record.id }).then((res)=>{
+        if(res.success){
+          that.$message.success(res.message)
+        }
+      });
+    }
   }
 }
 </script>
