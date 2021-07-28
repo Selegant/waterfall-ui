@@ -118,6 +118,10 @@ const saveOfflineTask = (params)=>postAction("/offlineTask/saveOfflineTask",para
 const getOfflineTaskList = (params)=>getAction("/offlineTask/list",params);
 
 const triggerOfflineTask = (params)=>postAction("/offlineTask/trigger",params);
+
+
+//数据模型
+const getModelFolder = (params)=>getAction("/modelManagement/folder",params);
 export {
   // imgView,
   // doMian,
@@ -189,7 +193,8 @@ export {
   getTableColumns,
   saveOfflineTask,
   getOfflineTaskList,
-  triggerOfflineTask
+  triggerOfflineTask,
+  getModelFolder
 }
 
 

@@ -7,7 +7,6 @@
     :disabled="disabled"
     :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
     :placeholder="placeholder"
-    :loadData="asyncLoadTreeData"
     :value="treeValue"
     :treeData="treeData"
     :multiple="multiple"
@@ -24,7 +23,7 @@
   import { getAction } from '@/api/manage'
 
   export default {
-    name: 'JTreeSelect',
+    name: 'WTreeSelect',
     props: {
       value:{
         type: String,
@@ -74,6 +73,11 @@
         type: Boolean,
         default: false,
         required:false
+      },
+      treeInitData:{
+        type: Array,
+        default: false,
+        required:false
       }
     },
     data () {
@@ -106,20 +110,25 @@
     },
     methods: {
       loadItemByCode(){
+        console.log(1111)
+        console.log(this.treeValue)
+        console.log(this.value)
         if(!this.value || this.value=="0"){
           this.treeValue = null
         }else{
-          getAction(`${this.view}${this.dict}`,{key:this.value}).then(res=>{
-            if(res.success){
-              let values = this.value.split(',')
-              this.treeValue = res.result.map((item, index) => ({
-                key: values[index],
-                value: values[index],
-                label: item
-              }))
-              this.onLoadTriggleChange(res.result[0]);
-            }
-          })
+          this.onLoadTriggleChange(this.treeValue)
+
+          // getAction(`${this.view}${this.dict}`,{key:this.value}).then(res=>{
+          //   if(res.success){
+          //     let values = this.value.split(',')
+          //     this.treeValue = res.result.map((item, index) => ({
+          //       key: values[index],
+          //       value: values[index],
+          //       label: item
+          //     }))
+          //     this.onLoadTriggleChange(res.result[0]);
+          //   }
+          // })
         }
       },
       onLoadTriggleChange(text){
@@ -184,31 +193,31 @@
         }
       },
       loadRoot(){
-        let param = {
-          pid:this.pidValue,
-          tableName:this.tableName,
-          text:this.text,
-          code:this.code,
-          pidField:this.pidField,
-          hasChildField:this.hasChildField,
-          condition:this.condition
-        }
-        getAction(this.url,param).then(res=>{
-          if(res.success && res.result){
-            for(let i of res.result){
-              i.value = i.key
-              if(i.leaf==false){
-                i.isLeaf=false
-              }else if(i.leaf==true){
-                i.isLeaf=true
-              }
-            }
-            this.treeData = [...res.result]
-            console.log(JSON.stringify(this.treeData))
-          }else{
-            console.log("数根节点查询结果-else",res)
-          }
-        })
+        this.treeData = this.treeInitData
+        // let param = {
+        //   pid:this.pidValue,
+        //   tableName:this.tableName,
+        //   text:this.text,
+        //   code:this.code,
+        //   pidField:this.pidField,
+        //   hasChildField:this.hasChildField,
+        //   condition:this.condition
+        // }
+        // getAction(this.url,param).then(res=>{
+        //   if(res.success && res.result){
+        //     for(let i of res.result){
+        //       i.value = i.key
+        //       if(i.leaf==false){
+        //         i.isLeaf=false
+        //       }else if(i.leaf==true){
+        //         i.isLeaf=true
+        //       }
+        //     }
+        //     this.treeData = [...res.result]
+        //   }else{
+        //     console.log("数根节点查询结果-else",res)
+        //   }
+        // })
       },
       onChange(value){
         if(!value){
