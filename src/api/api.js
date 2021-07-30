@@ -118,6 +118,7 @@ const saveOfflineTask = (params)=>postAction("/offlineTask/saveOfflineTask",para
 const getOfflineTaskList = (params)=>getAction("/offlineTask/list",params);
 
 const triggerOfflineTask = (params)=>postAction("/offlineTask/trigger",params);
+const getOfflineTaskDetail = (params)=>getAction("/offlineTask/detail",params);
 
 
 //数据模型
@@ -194,6 +195,7 @@ export {
   saveOfflineTask,
   getOfflineTaskList,
   triggerOfflineTask,
+  getOfflineTaskDetail,
   getModelFolder
 }
 

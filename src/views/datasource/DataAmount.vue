@@ -34,6 +34,13 @@
                 :showPagination = "false"
                 bordered
               >
+                <span slot="requiredTime" slot-scope="requiredTime">
+                  <template>
+                    <div style="">
+                      <p>{{ moment.duration(requiredTime).asSeconds() }}(秒)</p>
+                    </div>
+                  </template>
+                </span>
               </s-table>
             </div>
           </div>
@@ -53,6 +60,7 @@ import { getDataSourceTreeList, getDataSourceTables,getAmountList,asyncAmount } 
 import DataSourceModal from './modules/DataSourceModal'
 // import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 import { getServiceList } from '@/api/manage'
+import moment from 'moment'
 
 const MYSQL = 'MySQL'
 const ORACLE = 'Oracle'
@@ -68,6 +76,7 @@ export default {
   },
   data() {
     return {
+      moment,
       MYSQL,
       ORACLE,
       TABS,
@@ -90,17 +99,20 @@ export default {
         },
         {
           title: '数据量',
+          sorter: (a,b) => a.amount-b.amount,
           dataIndex: 'amount'
         },
         {
           title: '更新时间',
-          dataIndex: 'updateTime'
+          dataIndex: 'updateTime',
+          sorter: (a,b) => moment(a.updateTime).diff(moment(b.updateTime),'seconds'),
           // needTotal: true
         },
         {
           title: '更新所用时间',
           dataIndex: 'requiredTime',
-          sorter: true
+          sorter: (a,b) => a.requiredTime-b.requiredTime,
+          scopedSlots: { customRender: 'requiredTime' }
         }
       ],
       loadData: parameter => {

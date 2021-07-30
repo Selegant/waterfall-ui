@@ -100,6 +100,7 @@
     <!-- 表单区域 -->
     <!--    <jeecgOrderCustomer-modal ref="modalForm" @ok="modalFormOk"></jeecgOrderCustomer-modal>-->
     <add-offline-task ref="add" @close="closeOfflineTask"></add-offline-task>
+    <edit-offline-task ref="edit" @close="closeOfflineTask"></edit-offline-task>
   </a-card>
 </template>
 
@@ -109,11 +110,13 @@ import { getAction } from '@/api/manage'
 import AddOfflineTask from './modules/AddOfflineTask'
 import moment from 'moment'
 import { triggerOfflineTask } from '@/api/api'
+import EditOfflineTask from './modules/EditOfflineTask'
 
 export default {
   name: 'OfflineTaskList',
   mixins: [JeecgListMixin],
   components: {
+    EditOfflineTask,
     AddOfflineTask
   },
   data() {
@@ -205,6 +208,9 @@ export default {
     },
     handleAdd: function () {
       this.$refs.add.show()
+    },
+    handleEdit(row) {
+      this.$refs.edit.show(row)
     },
     closeOfflineTask() {
       // this.showAdd = false

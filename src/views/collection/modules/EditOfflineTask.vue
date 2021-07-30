@@ -305,12 +305,13 @@
 </template>
 
 <script>
-import { getDataSourceList, getDataSourceTables, getTableColumns, saveOfflineTask } from '@/api/api'
+import { getDataSourceList, getDataSourceTables, getTableColumns, saveOfflineTask,getOfflineTaskDetail } from '@/api/api'
 import { isNull } from 'xe-utils/methods'
 import JCron from '@/components/jeecg/JCron.vue'
+import pick from 'lodash.pick'
 
 export default {
-  name: 'AddOfflineTask',
+  name: 'EditOfflineTask',
   components: {
     JCron,
     VNodes: {
@@ -321,7 +322,7 @@ export default {
   data() {
     return {
       modal: {
-        title: '新增离线任务',
+        title: '编辑离线任务',
         visible: false,
         fullscreen: true,
         switchFullscreen: true,
@@ -334,9 +335,11 @@ export default {
         xs: { span: 24 },
         sm: { span: 12 },
       },
+      id:'',
+      model:{},
       incColumnShow: false,
       confirmLoading: false,
-      stepActiveKey: [1],
+      stepActiveKey: [1,2,3,4,5],
       form: this.$form.createForm(this),
       current: 0,
       customStyle: 'border: 0;',
@@ -387,9 +390,6 @@ export default {
     this.init()
   },
   methods: {
-    show() {
-      this.modal.visible = true
-    },
     init() {
       const that = this
       getDataSourceList({ 'purpose': 1 }).then((res) => {
@@ -401,6 +401,55 @@ export default {
         if (res.success) {
           that.targetList = res.result
         }
+      })
+    },
+    show(row) {
+      const that = this
+      that.id = row.id
+      getDataSourceTables(row.originalId + '-0').then((res) => {
+        if (res.success) {
+          that.originalTableList = res.result
+        }
+      })
+      getDataSourceTables(row.targetId + '-0').then((res) => {
+        if (res.success) {
+          that.targetTableList = res.result
+        }
+      })
+      this.modal.visible = true
+      this.collectionType = row.collectionType
+      this.incrementType = row.incrementType
+      this.task = row
+      this.initOriginalTable(row.originalTable)
+      this.initTargetTable(row.targetTable)
+
+      if (this.collectionType === 1) {
+        this.incColumnShow = true
+      } else {
+        this.incColumnShow = false
+      }
+      this.incColumn = row.incColumn
+      this.mappingColumns = JSON.parse(row.mappingColumns)
+      // this.mappingColumns.forEach((v,i)=>{
+      //   console.log(that.originalTableColumns)
+      //   this.originalTableColumns[v.originalColumnIndex].show=0
+      //   this.targetTableColumns[v.targetColumnIndex].show=0
+      // })
+      // console.log(this.originalTableColumns)
+      this.$nextTick(()=>{
+        that.form.setFieldsValue({
+          name:row.taskName,
+          desc:row.taskDesc,
+          originalId:row.originalId,
+          originalTable:row.originalTable,
+          collectionType:row.collectionType,
+          incrementType:row.incrementType,
+          targetId:row.targetId,
+          targetTable:row.targetTable,
+          taskCorn:row.taskCorn,
+          incStartId:row.incStartId,
+          incStartTime:row.incStartTime
+        })
       })
     },
     updateOriginal(v, e) {
@@ -422,9 +471,9 @@ export default {
       })
     },
     confirmOriginalTable(e) {
-      console.log(this.task.originalId)
       const that = this
-      console.log(that.stepActiveKey)
+      that.mappingColumns = []
+      that.originalTableColumns = []
       const params = {
         'id': this.task.originalId,
         'tableName': e
@@ -438,6 +487,8 @@ export default {
     },
     confirmTargetTable(e) {
       const that = this
+      that.mappingColumns = []
+      that.targetTableColumns = []
       const params = {
         'id': this.task.targetId,
         'tableName': e
@@ -445,6 +496,43 @@ export default {
       getTableColumns(params).then((res) => {
         if (res.success) {
           that.targetTableColumns = res.result
+        }
+      })
+    },
+    initOriginalTable(e) {
+      console.log(this.task.originalId)
+      const that = this
+      console.log(that.stepActiveKey)
+      const params = {
+        'id': this.task.originalId,
+        'tableName': e
+      }
+      getTableColumns(params).then((res) => {
+        if (res.success) {
+          that.originalTableColumns = res.result
+          if(that.mappingColumns.length > 0){
+            that.mappingColumns.forEach((v,i)=>{
+              that.originalTableColumns[v.originalColumnIndex].show=0
+            })
+          }
+        }
+      })
+      that.stepActiveKey.push(4)
+    },
+    initTargetTable(e) {
+      const that = this
+      const params = {
+        'id': this.task.targetId,
+        'tableName': e
+      }
+      getTableColumns(params).then((res) => {
+        if (res.success) {
+          that.targetTableColumns = res.result
+          if(that.mappingColumns.length > 0){
+            that.mappingColumns.forEach((v,i)=>{
+              that.targetTableColumns[v.targetColumnIndex].show=0
+            })
+          }
         }
       })
     },
@@ -519,6 +607,7 @@ export default {
           // eslint-disable-next-line no-console
           values.mappingColumns = this.mappingColumns
           values.incColumn = this.incColumn
+          values.id = this.id
           console.log('Received values of form: ', values)
           this.content = JSON.stringify(values)
           saveOfflineTask(values).then((res) => {

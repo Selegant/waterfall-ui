@@ -54,7 +54,7 @@
         </template>
 
         <template>
-          <a-form-model-item v-if="model.dbType==MYSQL" label="Database" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="dbName">
+          <a-form-model-item v-if="model.dbType==MYSQL||model.dbType==HIVE" label="Database" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="dbName">
             <a-input placeholder="请输入数据库名" v-model="model.dbName"  />
           </a-form-model-item>
         </template>
@@ -106,6 +106,7 @@
 
   const MYSQL='MySQL'
   const ORACLE = 'Oracle'
+  const HIVE = 'Hive'
 
   export default {
     name: "DataSourceModal",
@@ -115,6 +116,7 @@
       return {
         MYSQL,
         ORACLE,
+        HIVE,
         departDisabled: false, //是否是我的部门调用该页面
         roleDisabled: false, //是否是角色维护调用该页面
         modalWidth:800,
@@ -133,8 +135,8 @@
           port: [{required: true, message: '请输入数据库端口号!'}],
           dbName: [{required: true, message: '请输入数据库名!'}],
           serverName: [{required: true, message: '请输入服务名!'}],
-          username:[{ required: true, message: '请输入用户名!' }],
-          password: [{required: true, message: '请输入密码!'}],
+          username:[{ required: false, message: '请输入用户名!' }],
+          password: [{required: false, message: '请输入密码!'}],
         },
         departIdShow:false,
         title:"操作",

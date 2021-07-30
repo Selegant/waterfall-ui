@@ -17,7 +17,7 @@ let apiBaseUrl = window._CONFIG['domianURL'] || "/jeecg-boot";
 const service = axios.create({
   //baseURL: '/jeecg-boot',
   baseURL: apiBaseUrl, // api base_url
-  timeout: 20000 // 请求超时时间
+  timeout: 200000 // 请求超时时间
 })
 
 const err = (error) => {
