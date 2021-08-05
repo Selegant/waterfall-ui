@@ -353,6 +353,7 @@ export default {
       mappingColumnIndex: 0,
       collectionType: 0,
       incrementType: 0,
+      createTableFlag: false,
       task: {},
       steps: [
         {

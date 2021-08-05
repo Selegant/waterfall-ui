@@ -11,7 +11,7 @@
     <div class="copyright">
       Copyright
       <a-icon type="copyright"/>
-      2021 <span>Selegant 出品</span>
+      2021 <span>华卓科技 出品</span>
     </div>
   </div>
 </template>
