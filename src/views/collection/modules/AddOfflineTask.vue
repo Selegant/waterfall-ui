@@ -66,6 +66,8 @@
                   <a-form-item
                     label="数据源表或视图">
                     <a-select
+                      show-search
+                      :filter-option="filterOption"
                       placeholder="请选择数据源表"
                       @change="confirmOriginalTable"
                       v-decorator="[
@@ -206,6 +208,7 @@
                         <a-divider style="margin: 4px 0;"/>
                         <div
                           style="padding: 4px 8px; cursor: pointer;"
+                          @click="createTable"
                         >
                           <a-icon type="plus"/>
                           创建表
@@ -299,6 +302,7 @@
           </a-collapse-panel>
         </a-collapse>
       </a-form>
+      <create-table ref="createTable" @addTable="addTable"></create-table>
     </j-modal>
   </div>
 
@@ -308,10 +312,12 @@
 import { getDataSourceList, getDataSourceTables, getTableColumns, saveOfflineTask } from '@/api/api'
 import { isNull } from 'xe-utils/methods'
 import JCron from '@/components/jeecg/JCron.vue'
+import CreateTable from './CreateTable'
 
 export default {
   name: 'AddOfflineTask',
   components: {
+    CreateTable,
     JCron,
     VNodes: {
       functional: true,
@@ -353,7 +359,6 @@ export default {
       mappingColumnIndex: 0,
       collectionType: 0,
       incrementType: 0,
-      createTableFlag: false,
       task: {},
       steps: [
         {
@@ -400,7 +405,7 @@ export default {
       })
       getDataSourceList({ 'purpose': 2 }).then((res) => {
         if (res.success) {
-          that.targetList = res.result
+          that.targetList = res.result.filter((e)=>{return e.dbType === 'HIVE'})
         }
       })
     },
@@ -424,6 +429,7 @@ export default {
     },
     confirmOriginalTable(e) {
       console.log(this.task.originalId)
+      this.task.originalTable = e
       const that = this
       console.log(that.stepActiveKey)
       const params = {
@@ -558,7 +564,29 @@ export default {
       if(count===0){
         this.$message.warning('无匹配字段请手动匹配')
       }
-    }
+    },
+    createTable(){
+      if(!this.task.originalId){
+        this.$message.warning('请选择数据源');
+        return
+      }
+      if(!this.task.originalTable){
+        this.$message.warning('请选择源数据表');
+        return
+      }
+      this.$refs.createTable.init(this.task)
+    },
+    addTable(tableName){
+      this.targetTableList.push(tableName)
+      console.log(this.targetTableList)
+      this.form.setFieldsValue({targetTable:`${tableName}`})
+      this.confirmTargetTable(tableName)
+    },
+    filterOption(input, option) {
+      return (
+        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      );
+    },
   }
 }
 </script>

@@ -104,8 +104,8 @@ import AddOfflineTask from './modules/AddOfflineTask'
 import OfflineTaskList from './OfflineTaskList'
 import OnlineTaskList from './OnlineTaskList'
 
-const MYSQL = 'MySQL'
-const ORACLE = 'Oracle'
+const MYSQL = 'MYSQL'
+const ORACLE = 'ORACLE'
 
 const TABS = ['离线任务', '实时任务']
 

@@ -104,9 +104,9 @@
   import { disabledAuthFilter } from "@/utils/authFilter"
   import { duplicateCheck } from '@/api/api'
 
-  const MYSQL='MySQL'
-  const ORACLE = 'Oracle'
-  const HIVE = 'Hive'
+  const MYSQL='MYSQL'
+  const ORACLE = 'ORACLE'
+  const HIVE = 'HIVE'
 
   export default {
     name: "DataSourceModal",

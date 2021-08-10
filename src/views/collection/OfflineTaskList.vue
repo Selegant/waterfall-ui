@@ -215,7 +215,8 @@ export default {
     closeOfflineTask() {
       // this.showAdd = false
       // this.showList = true
-      this.$refs[`table${this.params.purpose}`][0].refresh()
+      // this.$refs[`table${this.params.purpose}`][0].refresh()
+      this.loadData(1)
     },
     triggerTask(record){
       const that = this

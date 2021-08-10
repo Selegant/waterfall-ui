@@ -119,6 +119,9 @@ const getOfflineTaskList = (params)=>getAction("/offlineTask/list",params);
 
 const triggerOfflineTask = (params)=>postAction("/offlineTask/trigger",params);
 const getOfflineTaskDetail = (params)=>getAction("/offlineTask/detail",params);
+const getTargetTypeColumns = (sourceId,targetId,originalTable)=>getAction('datasource/targetTypeColumns/'+sourceId+'/'+targetId+'/'+'/'+originalTable)
+const getDataTypes = (dbType)=>getAction('datasource/columnType/'+dbType)
+const createHiveTable = (params)=>postAction("/datasource/createTable",params)
 
 
 //数据模型
@@ -196,7 +199,10 @@ export {
   getOfflineTaskList,
   triggerOfflineTask,
   getOfflineTaskDetail,
-  getModelFolder
+  getModelFolder,
+  getTargetTypeColumns,
+  getDataTypes,
+  createHiveTable
 }
 
 

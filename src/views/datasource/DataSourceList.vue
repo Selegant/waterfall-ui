@@ -13,9 +13,9 @@
           <a-list-item slot="renderItem" slot-scope="item, index">
             <a-card :title="item.dataSourceName">
               <label>数据库类型：</label>
-              <a-tag v-if="item.dbType==MYSQL" color="#2db7f5"><div style="width: 40px;text-align: center">{{item.dbType}}</div></a-tag>
-              <a-tag v-if="item.dbType==ORACLE" color="#f50"><div style="width: 40px;text-align: center">{{item.dbType}}</div></a-tag>
-              <a-tag v-if="item.dbType==Hive" color="#FCE92F"><div style="width: 40px;text-align: center;color:#333333">{{item.dbType}}</div></a-tag>
+              <a-tag v-if="item.dbType==MYSQL" color="#2db7f5"><div style="width: 50px;text-align: center;">{{item.dbType}}</div></a-tag>
+              <a-tag v-if="item.dbType==ORACLE" color="#f50"><div style="width: 50px;text-align: center;">{{item.dbType}}</div></a-tag>
+              <a-tag v-if="item.dbType==HIVE" color="#FCE92F"><div style="width: 50px;text-align: center;color:#333333">{{item.dbType}}</div></a-tag>
               <br/>
               <label>Host：</label><span>{{item.host}}</span><br/>
               <label>Port：</label><span>{{item.port}}</span><br/>
@@ -81,9 +81,9 @@
 import {getDataSourceList,delDataSource} from '@/api/api'
 import DataSourceModal from './modules/DataSourceModal'
 import {JeecgListMixin} from '@/mixins/JeecgListMixin'
-const MYSQL='MySQL'
-const ORACLE = 'Oracle'
-const HIVE = 'Hive'
+const MYSQL='MYSQL'
+const ORACLE = 'ORACLE'
+const HIVE = 'HIVE'
 export default {
   name: 'DataSourceList',
   mixins: [JeecgListMixin],
