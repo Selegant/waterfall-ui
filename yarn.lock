@@ -1658,10 +1658,10 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
     "@types/color-name" "^1.1.1"
     color-convert "^2.0.1"
 
-ant-design-vue@^1.7.2:
-  version "1.7.4"
-  resolved "https://registry.npmjs.org/ant-design-vue/-/ant-design-vue-1.7.4.tgz#854e90985dc0fa9ccc6d681c104560c00eaaf855"
-  integrity sha512-f9/4I34Yq562X70aspSFzw4BCuKRICzDvIocXpsYCC+B9+kjB8db246fpSMtV/1anqxcmGHf7Vh0XJ+ovHJKMw==
+ant-design-vue@^1.7.7:
+  version "1.7.7"
+  resolved "https://registry.nlark.com/ant-design-vue/download/ant-design-vue-1.7.7.tgz?cache=0&sync_timestamp=1628756684105&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fant-design-vue%2Fdownload%2Fant-design-vue-1.7.7.tgz#621cca28c89e2887ec391e5c129c34d463f3803e"
+  integrity sha1-YhzKKMieKIfsOR5cEpw01GPzgD4=
   dependencies:
     "@ant-design/icons" "^2.1.1"
     "@ant-design/icons-vue" "^2.0.0"

@@ -126,6 +126,9 @@ const createHiveTable = (params)=>postAction("/datasource/createTable",params)
 
 //数据模型
 const getModelFolder = (params)=>getAction("/modelManagement/folder",params);
+const addModelFolder = (params)=>postAction("/modelManagement/addFolder",params);
+
+const getDataModuleList = (params)=>getAction("/modelManagement/dataModuleList",params);
 export {
   // imgView,
   // doMian,
@@ -202,7 +205,9 @@ export {
   getModelFolder,
   getTargetTypeColumns,
   getDataTypes,
-  createHiveTable
+  createHiveTable,
+  addModelFolder,
+  getDataModuleList
 }
 
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-modal :visible="visible" title="新建模型层级" :width="600">
+    <a-modal :visible="visible" title="新建模型层级" :width="600" @cancel="()=>{this.visible=false}" @ok="addModelLevel">
       <a-row :gutter="20">
         <a-col :md="24" :sm="24">
           <a-form :form="form" :label-col="{ span: 7 }" :wrapper-col="{ span: 14 }">
@@ -13,7 +13,7 @@
             </a-form-item>
             <a-form-item label="层级名称">
               <a-input
-                v-decorator="['folderName', { rules: [{ required: true, message: '请输入层级名称' }] }]"
+                v-decorator="['levelName', { rules: [{ required: true, message: '请选则模型类型' }] }]"
               />
             </a-form-item>
             <a-form-item label="模型类型">
@@ -44,6 +44,7 @@
 
 <script>
 import WTreeSelect from '../../../components/waterfall/WTreeSelect'
+import { addModelFolder } from '../../../api/api'
 export default {
   name: 'ModelType',
   components: { WTreeSelect },
@@ -63,6 +64,26 @@ export default {
   methods: {
     open() {
       this.visible = true
+      this.form.resetFields()
+    },
+    addModelLevel(){
+      const that = this
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          // eslint-disable-next-line no-console
+          console.log('Received values of form: ', values)
+          addModelFolder(values).then((res) =>{
+            if (res.success) {
+              that.$emit('refresh')
+              that.$message.success('保存成功')
+              that.visible = false
+              // that.modal.visible = false
+            } else {
+              that.$message.error(res.message)
+            }
+          })
+        }
+      })
     }
   }
 }
