@@ -1,7 +1,39 @@
 <template>
   <div style="width:100%;">
     <!-- 查询区域 -->
-    <div class="">
+    <div class="table-page-search-wrapper">
+      <!-- 搜索区域 -->
+      <a-form layout="inline" >
+        <a-row :gutter="24">
+          <a-col :md="6" :sm="8">
+            <a-form-item style="margin: 0px;" label="关键字" :labelCol="{span: 5}" :wrapperCol="{span: 5, offset: 1}">
+              <a-input placeholder="" ></a-input>
+            </a-form-item>
+          </a-col>
+          <!--
+          <a-col :md="11" :sm="12">
+            <a-form-item label="创建时间" :labelCol="{span: 5}" :wrapperCol="{span: 18, offset: 1}">
+              <j-date v-model="queryParam.createTime_begin" :showTime="true" date-format="YYYY-MM-DD HH:mm:ss" style="width:45%" placeholder="请选择开始时间" ></j-date>
+              <span style="width: 10px;">~</span>
+              <j-date v-model="queryParam.createTime_end" :showTime="true" date-format="YYYY-MM-DD HH:mm:ss" style="width:45%" placeholder="请选择结束时间"></j-date>
+            </a-form-item>
+          </a-col>
+          -->
+          <span style="" class="">
+            <a-col :md="8" :sm="8">
+              <a-button type="primary" icon="search" style="margin-left: 21px">查询</a-button>
+              <a-button icon="reload" style="margin-left: 8px">重置</a-button>
+            </a-col>
+          </span>
+
+          <span style="display: flex;justify-content: flex-end" class="">
+            <a-col>
+              <a-button icon="vertical-align-bottom" style="margin-left: 21px">导入</a-button>
+              <a-button type="primary"  icon="plus" style="margin-left: 8px">新建数据模型</a-button>
+            </a-col>
+          </span>
+        </a-row>
+      </a-form>
     </div>
 
     <div>
@@ -130,8 +162,14 @@ export default {
       }
       this.fetch()
     },
-    fetch() {
+    fetch(node) {
       this.loading = true
+      if(node){
+        this.params.folderId = node
+      }else {
+        this.params.folderId = 0;
+      }
+      console.log(this.params)
       getDataModuleList(this.params).then((res) => {
         const pagination = { ...this.pagination }
         console.log(res)

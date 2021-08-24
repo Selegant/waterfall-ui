@@ -4,14 +4,14 @@
 <!--    <div style="display: flex;">-->
       <a-row :gutter="20">
         <a-col :md="3" :sm="24">
-          <div style="background: #FFFFFF;height: calc(79vh);">
+          <div style="background: #FFFFFF;">
             <div style="display: flex;flex-direction:row-reverse;height: 25px;line-height:25px;background:#F5F5F5 ">
               <div>
                 <i class="action-jeecg actionxinzengwenjianjia-icon" style="font-size: 20px;" @click="()=>{this.$refs.modelType.open()}"/>
               </div>
             </div>
             <div style="padding: 0px 15px;">
-              <a-tree :tree-data="treeData" show-icon defaultExpandAll>
+              <a-tree :tree-data="treeData" show-icon defaultExpandAll @select="changeTreeNode">
                 <template #title="{ key: treeKey, title }">
                   <a-dropdown :trigger="['contextmenu']">
                     <span>{{ title }}</span>
@@ -37,7 +37,7 @@
                 <a-tab-pane tab="模型设计" key="1">
                   <!--          <offline-task-list ref="OfflineTaskList"></offline-task-list>-->
 <!--                  <div style="width:100%;height: calc(63.6vh)"></div>-->
-                  <model-list></model-list>
+                  <model-list ref="modelList"></model-list>
                 </a-tab-pane>
                 <a-tab-pane tab="已发布模型" key="2" forceRender>
                   <!--          <online-task-list ref="OnlineTaskList"></online-task-list>-->
@@ -118,6 +118,10 @@ export default {
         this.modelTreeData[0].children = tree
       })
     },
+    changeTreeNode(selectedKeys){
+      console.log(selectedKeys)
+      this.$refs.modelList.fetch(selectedKeys[0])
+    }
   }
 }
 </script>
