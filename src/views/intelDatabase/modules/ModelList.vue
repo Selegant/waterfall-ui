@@ -1,20 +1,25 @@
 <template>
   <div style="width:100%;">
-    <a-table
-      bordered
-      size="middle"
-      :columns="columns"
-      :data-source="data"
-      :pagination="pagination"
-      :loading="loading"
-      @change="handleTableChange"
-    >
+    <!-- 查询区域 -->
+    <div class="">
+    </div>
+
+    <div>
+      <a-table
+        bordered
+        size="middle"
+        :columns="columns"
+        :data-source="data"
+        :pagination="pagination"
+        :loading="loading"
+        @change="handleTableChange"
+      >
       <span slot="modelStatus" slot-scope="text, record">
         <a-tag v-if="record.modelStatusCode===1" color="gray">未发布</a-tag>
         <a-tag v-if="record.modelStatusCode===2" color="blue">已发布</a-tag>
       </span>
 
-      <span slot="action" slot-scope="text, record">
+        <span slot="action" slot-scope="text, record">
               <a @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical"/>
               <a @click="handleEdit(record)">质量</a>
@@ -46,7 +51,9 @@
                 </a-menu>
               </a-dropdown>
             </span>
-    </a-table>
+      </a-table>
+    </div>
+
   </div>
 </template>
 
@@ -151,5 +158,5 @@ export default {
 </script>
 
 <style scoped>
-
+@import '~@assets/less/common.less'
 </style>

@@ -39,10 +39,10 @@
 <!--                  <div style="width:100%;height: calc(63.6vh)"></div>-->
                   <model-list></model-list>
                 </a-tab-pane>
-<!--                <a-tab-pane tab="已发布模型" key="2" forceRender>-->
-<!--                  &lt;!&ndash;          <online-task-list ref="OnlineTaskList"></online-task-list>&ndash;&gt;-->
-<!--                  <div style="width:100%;height: calc(63.6vh)"></div>-->
-<!--                </a-tab-pane>-->
+                <a-tab-pane tab="已发布模型" key="2" forceRender>
+                  <!--          <online-task-list ref="OnlineTaskList"></online-task-list>-->
+                  <model-list></model-list>
+                </a-tab-pane>
               </a-tabs>
             </div>
           </div>
