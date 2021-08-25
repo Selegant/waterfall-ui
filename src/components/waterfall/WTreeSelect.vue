@@ -21,6 +21,7 @@
   * <j-tree-select dict="aa_tree_test,aad,id" pid-field="pid" ></j-tree-select>
   * */
   import { getAction } from '@/api/manage'
+  import { getFolderItem } from "@/utils/util"
 
   export default {
     name: 'WTreeSelect',
@@ -93,7 +94,8 @@
       }
     },
     watch: {
-      value () {
+      value (val) {
+        console.log(val,'监听到值变化');
         this.loadItemByCode()
       },
       dict(){
@@ -110,12 +112,16 @@
     },
     methods: {
       loadItemByCode(){
-        console.log(1111)
-        console.log(this.treeValue)
-        console.log(this.value)
-        if(!this.value || this.value=="0"){
+        console.log(this.treeValue,'treeValue')
+        console.log(this.value,'value')
+        if(!this.value && this.value!="0"){
           this.treeValue = null
         }else{
+          let folderItem = getFolderItem('key',this.value,this.treeData)
+          this.treeValue = {
+            value:this.value,
+            label:folderItem.title
+          }
           this.onLoadTriggleChange(this.treeValue)
 
           // getAction(`${this.view}${this.dict}`,{key:this.value}).then(res=>{
@@ -132,6 +138,7 @@
         }
       },
       onLoadTriggleChange(text){
+        console.log(text,'text');
         //只有单选才会触发
         if(!this.multiple && this.loadTriggleChange){
           this.$emit('change', this.value,text)
@@ -220,6 +227,7 @@
         // })
       },
       onChange(value){
+        console.log(value,'value');
         if(!value){
           this.$emit('change', '');
           this.treeValue = null

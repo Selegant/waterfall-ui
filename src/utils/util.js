@@ -560,3 +560,22 @@ export function removeArrayElement(array, prod, value) {
     array.splice(index, 1);
   }
 }
+// 根据键值名，键值筛选树状数组中符合条件的第一个元素对象
+export function getFolderItem(keyName,keyValue,arr){
+  let hasFound = false
+  let result = null
+  let fn = function(arr){
+    if(Array.isArray(arr)&&!hasFound){
+      arr.forEach(item=>{
+        if(item[keyName] == keyValue){
+          result = item
+          hasFound = true
+        }else if(item.children){
+          fn(item.children)
+        }
+      })
+    }
+  }
+  fn(arr)
+  return result
+}

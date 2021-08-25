@@ -127,6 +127,8 @@ const createHiveTable = (params)=>postAction("/datasource/createTable",params)
 //数据模型
 const getModelFolder = (params)=>getAction("/modelManagement/folder",params);
 const addModelFolder = (params)=>postAction("/modelManagement/addFolder",params);
+const updateModelFolder = (params)=>putAction("/modelManagement/folder",params);
+const deleteModelFolder = (params)=>deleteAction(`/modelManagement/folder/${params.id}`);
 
 const getDataModuleList = (params)=>getAction("/modelManagement/dataModuleList",params);
 export {
@@ -207,6 +209,8 @@ export {
   getDataTypes,
   createHiveTable,
   addModelFolder,
+  updateModelFolder,
+  deleteModelFolder,
   getDataModuleList
 }
 

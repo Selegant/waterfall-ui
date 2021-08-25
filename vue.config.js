@@ -87,7 +87,7 @@ module.exports = {
       }, */
       '/jeecg-boot': {
         // target: 'http://192.168.20.23:8080', // 请求本地 需要jeecg-boot后台项目
-        target: 'http://localhost:8080', // 请求本地 需要jeecg-boot后台项目
+        target: 'http://172.16.255.159:8080', // 请求本地 需要jeecg-boot后台项目
         ws: false,
         changeOrigin: true
       }

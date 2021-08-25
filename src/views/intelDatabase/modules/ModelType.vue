@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-modal :visible="visible" title="新建模型层级" :width="600" @cancel="()=>{this.visible=false}" @ok="addModelLevel">
+    <a-modal :visible="visible" :title="modalTitle" :width="600" @cancel="()=>{this.visible=false}" @ok="addModelLevel">
       <a-row :gutter="20">
         <a-col :md="24" :sm="24">
           <a-form :form="form" :label-col="{ span: 7 }" :wrapper-col="{ span: 14 }">
@@ -13,10 +13,10 @@
             </a-form-item>
             <a-form-item label="层级名称">
               <a-input
-                v-decorator="['levelName', { rules: [{ required: true, message: '请选则模型类型' }] }]"
+                v-decorator="['folderName', { rules: [{ required: true, message: '请选则模型类型' }] }]"
               />
             </a-form-item>
-            <a-form-item label="模型类型">
+            <!-- <a-form-item label="模型类型">
               <a-select
                 v-decorator="['mark', { rules: [{ required: true, message: '请选则模型类型' }] }]"
               >
@@ -29,10 +29,10 @@
                 <a-select-option value="7">质量评估EVL</a-select-option>
                 <a-select-option value="8">其他</a-select-option>
               </a-select>
-            </a-form-item>
+            </a-form-item> -->
             <a-form-item label="描述">
               <a-input
-                v-decorator="['folderName', { rules: [{ required: false, message: '请输入描述' }] }]"
+                v-decorator="['remark', { rules: [{ required: false, message: '请输入描述' }] }]"
               />
             </a-form-item>
           </a-form>
@@ -44,7 +44,7 @@
 
 <script>
 import WTreeSelect from '../../../components/waterfall/WTreeSelect'
-import { addModelFolder } from '../../../api/api'
+import { addModelFolder, updateModelFolder } from '../../../api/api'
 export default {
   name: 'ModelType',
   components: { WTreeSelect },
@@ -57,14 +57,31 @@ export default {
   },
   data() {
     return {
+      id:null,
+      modalTitle:'新建模型层级',
       form: this.$form.createForm(this, { name: 'modelType' }),
       visible: false
     }
   },
   methods: {
-    open() {
+    open(folderObj) {
+      console.log(folderObj,'folderObj');
       this.visible = true
       this.form.resetFields()
+      this.modalTitle=folderObj?'编辑模型层级':'新建模型层级'
+      this.id = folderObj?folderObj.id:null
+      if(folderObj){
+        let {folderName,parentId,remark} = {...folderObj}
+        // 编辑
+        this.$nextTick(()=>{
+          this.form.setFieldsValue({
+            parentId:String(parentId),
+            folderName:folderName,
+            remark:remark
+          });
+        })
+      }
+      console.log(this.id,'id');
     },
     addModelLevel(){
       const that = this
@@ -72,16 +89,34 @@ export default {
         if (!err) {
           // eslint-disable-next-line no-console
           console.log('Received values of form: ', values)
-          addModelFolder(values).then((res) =>{
-            if (res.success) {
-              that.$emit('refresh')
-              that.$message.success('保存成功')
-              that.visible = false
-              // that.modal.visible = false
-            } else {
-              that.$message.error(res.message)
+          if(this.id){
+            let params = {
+              ...values,
+              id:this.id
             }
-          })
+            // 更新文件夹
+            updateModelFolder(params).then((res) =>{
+              if (res.success) {
+                that.$emit('refresh')
+                that.$message.success('更新成功')
+                that.visible = false
+              } else {
+                that.$message.error(res.message)
+              }
+            })
+          }else{
+            // 新增文件夹
+            addModelFolder(values).then((res) =>{
+              if (res.success) {
+                that.$emit('refresh')
+                that.$message.success('保存成功')
+                that.visible = false
+                // that.modal.visible = false
+              } else {
+                that.$message.error(res.message)
+              }
+            })
+          }
         }
       })
     }

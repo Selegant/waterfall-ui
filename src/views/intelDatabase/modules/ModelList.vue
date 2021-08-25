@@ -3,12 +3,12 @@
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
       <!-- 搜索区域 -->
-      <a-form layout="inline" >
+      <a-form-model layout="inline" :model="params" >
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
-            <a-form-item style="margin: 0px;" label="关键字" :labelCol="{span: 5}" :wrapperCol="{span: 5, offset: 1}">
-              <a-input placeholder="" ></a-input>
-            </a-form-item>
+            <a-form-model-item style="margin: 0px;" label="关键字" :labelCol="{span: 5}" :wrapperCol="{span: 5, offset: 1}">
+              <a-input placeholder="请输入关键字" v-model="params.modelName" ></a-input>
+            </a-form-model-item>
           </a-col>
           <!--
           <a-col :md="11" :sm="12">
@@ -33,7 +33,7 @@
             </a-col>
           </span>
         </a-row>
-      </a-form>
+      </a-form-model>
     </div>
 
     <div>
@@ -145,7 +145,10 @@ export default {
       },
       loading: false,
       columns,
-      params: {}
+      params: {
+        modelName:'',
+        folderId:0
+      }
     }
   },
   mounted() {
@@ -163,11 +166,17 @@ export default {
       this.fetch()
     },
     fetch(node) {
+      this.params.modelName=''
       this.loading = true
       if(node){
         this.params.folderId = node
       }else {
         this.params.folderId = 0;
+      }
+      this.params = {
+        ...this.params,
+        pageNo:this.pagination.current,
+        pageSize:this.pagination.pageSize
       }
       console.log(this.params)
       getDataModuleList(this.params).then((res) => {
