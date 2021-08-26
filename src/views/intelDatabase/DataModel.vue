@@ -96,7 +96,8 @@ export default {
         },
         value: '0',
         children:[]
-      }]
+      }],
+      selectedKey:null
     }
   },
   mounted() {
@@ -120,6 +121,7 @@ export default {
       })
     },
     changeTreeNode(selectedKeys){
+      this.selectedKey = selectedKeys[0]
       console.log(selectedKeys)
       this.$refs.modelList.fetch(selectedKeys[0])
     },
@@ -135,7 +137,9 @@ export default {
         deleteModelFolder({id:treeKey}).then(async (res) =>{
               if (res.success) {
                 await this.init()
-                await this.$refs.modelList.fetch()
+                if(this.selectedKey==treeKey){
+                  await this.$refs.modelList.fetch()
+                }
                 this.$message.success('删除成功')
               } else {
                 this.$message.error(res.message)

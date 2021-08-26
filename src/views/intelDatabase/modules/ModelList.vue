@@ -3,7 +3,7 @@
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
       <!-- 搜索区域 -->
-      <a-form-model layout="inline" :model="params" >
+      <a-form-model layout="inline" :model="params" @keyup.enter.native="search">
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
             <a-form-model-item style="margin: 0px;" label="关键字" :labelCol="{span: 5}" :wrapperCol="{span: 5, offset: 1}">
@@ -21,15 +21,15 @@
           -->
           <span style="" class="">
             <a-col :md="8" :sm="8">
-              <a-button type="primary" icon="search" style="margin-left: 21px">查询</a-button>
-              <a-button icon="reload" style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" icon="search" style="margin-left: 21px" @click="search">查询</a-button>
+              <a-button icon="reload" style="margin-left: 8px" @click="reset">重置</a-button>
             </a-col>
           </span>
 
           <span style="display: flex;justify-content: flex-end" class="">
             <a-col>
               <a-button icon="vertical-align-bottom" style="margin-left: 21px">导入</a-button>
-              <a-button type="primary"  icon="plus" style="margin-left: 8px">新建数据模型</a-button>
+              <a-button type="primary"  icon="plus" style="margin-left: 8px" @click="addDataModel">新建数据模型</a-button>
             </a-col>
           </span>
         </a-row>
@@ -85,13 +85,13 @@
             </span>
       </a-table>
     </div>
-
+    <add-model-modal ref="modalForm" @modalFormOk="modalFormOk"></add-model-modal>
   </div>
 </template>
 
 <script>
 import { getDataModuleList } from '../../../api/api'
-
+import AddModelModal from './AddModelModal'
 const queryData = params => {
   return axios.get('https://randomuser.me/api', { params: params })
 }
@@ -123,12 +123,13 @@ const columns = [
     title: '操作',
     scopedSlots: { customRender: 'action' },
     align: 'center',
-    width: '150px'
+    width: '180px'
   },
 ]
 
 export default {
   name: 'ModelList',
+  components: { AddModelModal },
   data() {
     return {
       data: [],
@@ -137,7 +138,7 @@ export default {
         pageSize: 10,
         pageSizeOptions: ['10', '20', '30'],
         showTotal: (total, range) => {
-          // return range[0] + "-" + range[1] + " 共" + total + "条"
+          return  " 共" + total + "条"
         },
         showQuickJumper: true,
         showSizeChanger: true,
@@ -152,27 +153,34 @@ export default {
     }
   },
   mounted() {
-    this.fetch()
+    this.loadData()
   },
   methods: {
-    handleTableChange(pagination, filters, sorter) {
-      console.log(pagination)
-      const pager = { ...this.pagination }
-      pager.current = pagination.current
-      this.pagination = pager
-      this.params ={
-        pageNo:pager.current
-      }
-      this.fetch()
+    addDataModel(){
+      this.$refs.modalForm.add();
+      this.$refs.modalForm.title = "新建-数据模型";
+      this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
     },
-    fetch(node) {
+    modalFormOk(){
+      // 新增、编辑成功刷新列表数据
+      this.loadData()
+    },
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination,'pagination');
+      this.pagination = {...pagination}
+      this.loadData()
+    },
+    search(){
+      this.pagination.current=1
+      this.loadData()
+    },
+    reset(){
       this.params.modelName=''
+      this.pagination.current=1
+      this.loadData()
+    },
+    loadData(){
       this.loading = true
-      if(node){
-        this.params.folderId = node
-      }else {
-        this.params.folderId = 0;
-      }
       this.params = {
         ...this.params,
         pageNo:this.pagination.current,
@@ -187,6 +195,16 @@ export default {
         this.data = res.result.records
         this.pagination = pagination
       })
+    },
+    fetch(node) {
+      this.params=this.$options.data().params
+      this.pagination=this.$options.data().pagination
+      if(node){
+        this.params.folderId = node
+      }else {
+        this.params.folderId = 0;
+      }
+      this.loadData()
       // queryData({
       //   results: 10,
       //   ...params,
