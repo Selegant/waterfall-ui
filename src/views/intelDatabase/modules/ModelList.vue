@@ -28,7 +28,7 @@
 
           <span style="display: flex;justify-content: flex-end" class="">
             <a-col>
-              <a-button icon="vertical-align-bottom" style="margin-left: 21px">导入</a-button>
+              <a-button icon="vertical-align-bottom" style="margin-left: 21px" @click="importDataModule">导入数据模型</a-button>
               <a-button type="primary"  icon="plus" style="margin-left: 8px" @click="addDataModel">新建数据模型</a-button>
             </a-col>
           </span>
@@ -52,31 +52,22 @@
       </span>
 
         <span slot="action" slot-scope="text, record">
-              <a @click="handleEdit(record)">编辑</a>
+              <a @click="editDataModel(record.id)">编辑</a>
               <a-divider type="vertical"/>
               <a @click="handleEdit(record)">质量</a>
               <a-divider type="vertical"/>
-              <a @click="handleEdit(record)">发布</a>
+              <a @click="publishDataModule(record)">{{record.modelStatusCode===1?'发布':record.modelStatusCode===2?'下架':''}}</a>
               <a-divider type="vertical"/>
               <a-dropdown>
                 <a class="ant-dropdown-link">
                   更多 <a-icon type="down"/>
                 </a>
                 <a-menu slot="overlay">
-                   <a-menu-item>
-                    <a href="javascript:;" @click="triggerTask(record)">执行一次</a>
+                  <a-menu-item>
+                    <a href="javascript:;" @click="detailClick(record.id)">详情</a>
                   </a-menu-item>
                   <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">开启</a>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">停止</a>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">详情</a>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                    <a-popconfirm title="确定删除吗?" @confirm="() => deleteDataModule(record.id)">
                       <a>删除</a>
                     </a-popconfirm>
                   </a-menu-item>
@@ -90,7 +81,7 @@
 </template>
 
 <script>
-import { getDataModuleList } from '../../../api/api'
+import { getDataModuleList, publishDataModule, unpublishDataModule, deleteDataModule } from '../../../api/api'
 import AddModelModal from './AddModelModal'
 const queryData = params => {
   return axios.get('https://randomuser.me/api', { params: params })
@@ -103,7 +94,7 @@ const columns = [
   },
   {
     title: '描述',
-    dataIndex: 'ramark',
+    dataIndex: 'remark',
     width: '300px'
   },
   {
@@ -156,10 +147,59 @@ export default {
     this.loadData()
   },
   methods: {
+    deleteDataModule(id){
+      deleteDataModule({id}).then(res=>{
+        if(res.success){
+          this.$message.success(res.message)
+          this.loadData()
+        }else{
+          this.$message.error(res.message)
+        }
+      })
+    },
+    publishDataModule({modelStatusCode,id}){
+      console.log(id,'发布id');
+      const fu = res=>{
+        if(res.success){
+          this.$message.success(res.message)
+          this.loadData()
+        }else{
+          this.$message.warning(res.message)
+        }
+      }
+      if(modelStatusCode==1){
+        publishDataModule({id}).then(
+          fu
+        )
+      }
+      if(modelStatusCode==2){
+        unpublishDataModule({id}).then(
+          fu
+        )
+      }
+    },
     addDataModel(){
-      this.$refs.modalForm.add();
       this.$refs.modalForm.title = "新建-数据模型";
       this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
+      this.$refs.modalForm.add();
+    },
+    editDataModel(id){
+      this.$refs.modalForm.title = "编辑-数据模型";
+      this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
+      this.$refs.modalForm.formData.id=id
+      this.$refs.modalForm.edit();
+    },
+    detailClick(id){
+      this.$refs.modalForm.title = "详情-数据模型";
+      this.$refs.modalForm.formData.id=id
+      this.$refs.modalForm.isDetail=true
+      this.$refs.modalForm.edit();
+    },
+    importDataModule(){
+      this.$refs.modalForm.title = "导入数据模型";
+      this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
+      this.$refs.modalForm.isImport=true
+      this.$refs.modalForm.add();
     },
     modalFormOk(){
       // 新增、编辑成功刷新列表数据

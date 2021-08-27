@@ -129,6 +129,11 @@ const getModelFolder = (params)=>getAction("/modelManagement/folder",params);
 const addModelFolder = (params)=>postAction("/modelManagement/addFolder",params);
 const updateModelFolder = (params)=>putAction("/modelManagement/folder",params);
 const deleteModelFolder = (params)=>deleteAction(`/modelManagement/folder/${params.id}`);
+const getDataModuleDetail = (params)=>getAction(`/modelManagement/data-module/${params.id}`);
+const publishDataModule = (params)=>postAction(`/modelManagement/data-module/publish/${params.id}`);
+const unpublishDataModule = (params)=>postAction(`/modelManagement/data-module/unpublish/${params.id}`);
+const deleteDataModule = (params)=>deleteAction(`/modelManagement/data-module/${params.id}`);
+const getModalByTable = (params)=>postAction(`modelManagement/data-module/${params.folderId}/${params.source}/${params.tableName}`)
 
 const getDataModuleList = (params)=>getAction("/modelManagement/dataModuleList",params);
 export {
@@ -211,7 +216,12 @@ export {
   addModelFolder,
   updateModelFolder,
   deleteModelFolder,
-  getDataModuleList
+  getDataModuleDetail,
+  getDataModuleList,
+  publishDataModule,
+  unpublishDataModule,
+  deleteDataModule,
+  getModalByTable
 }
 
 
