@@ -3,12 +3,12 @@
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
       <!-- 搜索区域 -->
-      <a-form layout="inline" >
+      <a-form-model layout="inline" :model="params" @keyup.enter.native="search">
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
-            <a-form-item style="margin: 0px;" label="关键字" :labelCol="{span: 5}" :wrapperCol="{span: 5, offset: 1}">
-              <a-input placeholder="" ></a-input>
-            </a-form-item>
+            <a-form-model-item style="margin: 0px;" label="关键字" :labelCol="{span: 5}" :wrapperCol="{span: 5, offset: 1}">
+              <a-input placeholder="请输入关键字" v-model="params.modelName" ></a-input>
+            </a-form-model-item>
           </a-col>
           <!--
           <a-col :md="11" :sm="12">
@@ -21,19 +21,19 @@
           -->
           <span style="" class="">
             <a-col :md="8" :sm="8">
-              <a-button type="primary" icon="search" style="margin-left: 21px">查询</a-button>
-              <a-button icon="reload" style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" icon="search" style="margin-left: 21px" @click="search">查询</a-button>
+              <a-button icon="reload" style="margin-left: 8px" @click="reset">重置</a-button>
             </a-col>
           </span>
 
           <span style="display: flex;justify-content: flex-end" class="">
             <a-col>
-              <a-button icon="vertical-align-bottom" style="margin-left: 21px">导入</a-button>
-              <a-button type="primary"  icon="plus" style="margin-left: 8px">新建数据模型</a-button>
+              <a-button icon="vertical-align-bottom" style="margin-left: 21px" @click="importDataModule">导入数据模型</a-button>
+              <a-button type="primary"  icon="plus" style="margin-left: 8px" @click="addDataModel">新建数据模型</a-button>
             </a-col>
           </span>
         </a-row>
-      </a-form>
+      </a-form-model>
     </div>
 
     <div>
@@ -52,31 +52,22 @@
       </span>
 
         <span slot="action" slot-scope="text, record">
-              <a @click="handleEdit(record)">编辑</a>
+              <a @click="editDataModel(record.id)">编辑</a>
               <a-divider type="vertical"/>
               <a @click="handleEdit(record)">质量</a>
               <a-divider type="vertical"/>
-              <a @click="handleEdit(record)">发布</a>
+              <a @click="publishDataModule(record)">{{record.modelStatusCode===1?'发布':record.modelStatusCode===2?'下架':''}}</a>
               <a-divider type="vertical"/>
               <a-dropdown>
                 <a class="ant-dropdown-link">
                   更多 <a-icon type="down"/>
                 </a>
                 <a-menu slot="overlay">
-                   <a-menu-item>
-                    <a href="javascript:;" @click="triggerTask(record)">执行一次</a>
+                  <a-menu-item>
+                    <a href="javascript:;" @click="detailClick(record.id)">详情</a>
                   </a-menu-item>
                   <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">开启</a>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">停止</a>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <a href="javascript:;" @click="handleDetail(record)">详情</a>
-                  </a-menu-item>
-                  <a-menu-item>
-                    <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                    <a-popconfirm title="确定删除吗?" @confirm="() => deleteDataModule(record.id)">
                       <a>删除</a>
                     </a-popconfirm>
                   </a-menu-item>
@@ -85,13 +76,13 @@
             </span>
       </a-table>
     </div>
-
+    <add-model-modal ref="modalForm" @modalFormOk="modalFormOk"></add-model-modal>
   </div>
 </template>
 
 <script>
-import { getDataModuleList } from '../../../api/api'
-
+import { getDataModuleList, publishDataModule, unpublishDataModule, deleteDataModule } from '../../../api/api'
+import AddModelModal from './AddModelModal'
 const queryData = params => {
   return axios.get('https://randomuser.me/api', { params: params })
 }
@@ -103,7 +94,7 @@ const columns = [
   },
   {
     title: '描述',
-    dataIndex: 'ramark',
+    dataIndex: 'remark',
     width: '300px'
   },
   {
@@ -123,12 +114,13 @@ const columns = [
     title: '操作',
     scopedSlots: { customRender: 'action' },
     align: 'center',
-    width: '150px'
+    width: '180px'
   },
 ]
 
 export default {
   name: 'ModelList',
+  components: { AddModelModal },
   data() {
     return {
       data: [],
@@ -137,7 +129,7 @@ export default {
         pageSize: 10,
         pageSizeOptions: ['10', '20', '30'],
         showTotal: (total, range) => {
-          // return range[0] + "-" + range[1] + " 共" + total + "条"
+          return  " 共" + total + "条"
         },
         showQuickJumper: true,
         showSizeChanger: true,
@@ -145,29 +137,94 @@ export default {
       },
       loading: false,
       columns,
-      params: {}
+      params: {
+        modelName:'',
+        folderId:0
+      }
     }
   },
   mounted() {
-    this.fetch()
+    this.loadData()
   },
   methods: {
-    handleTableChange(pagination, filters, sorter) {
-      console.log(pagination)
-      const pager = { ...this.pagination }
-      pager.current = pagination.current
-      this.pagination = pager
-      this.params ={
-        pageNo:pager.current
-      }
-      this.fetch()
+    deleteDataModule(id){
+      deleteDataModule({id}).then(res=>{
+        if(res.success){
+          this.$message.success(res.message)
+          this.loadData()
+        }else{
+          this.$message.error(res.message)
+        }
+      })
     },
-    fetch(node) {
+    publishDataModule({modelStatusCode,id}){
+      console.log(id,'发布id');
+      const fu = res=>{
+        if(res.success){
+          this.$message.success(res.message)
+          this.loadData()
+        }else{
+          this.$message.warning(res.message)
+        }
+      }
+      if(modelStatusCode==1){
+        publishDataModule({id}).then(
+          fu
+        )
+      }
+      if(modelStatusCode==2){
+        unpublishDataModule({id}).then(
+          fu
+        )
+      }
+    },
+    addDataModel(){
+      this.$refs.modalForm.title = "新建-数据模型";
+      this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
+      this.$refs.modalForm.add();
+    },
+    editDataModel(id){
+      this.$refs.modalForm.title = "编辑-数据模型";
+      this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
+      this.$refs.modalForm.formData.id=id
+      this.$refs.modalForm.edit();
+    },
+    detailClick(id){
+      this.$refs.modalForm.title = "详情-数据模型";
+      this.$refs.modalForm.formData.id=id
+      this.$refs.modalForm.isDetail=true
+      this.$refs.modalForm.edit();
+    },
+    importDataModule(){
+      this.$refs.modalForm.title = "导入数据模型";
+      this.$refs.modalForm.formData.folderId=Number(this.params.folderId)
+      this.$refs.modalForm.isImport=true
+      this.$refs.modalForm.add();
+    },
+    modalFormOk(){
+      // 新增、编辑成功刷新列表数据
+      this.loadData()
+    },
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination,'pagination');
+      this.pagination = {...pagination}
+      this.loadData()
+    },
+    search(){
+      this.pagination.current=1
+      this.loadData()
+    },
+    reset(){
+      this.params.modelName=''
+      this.pagination.current=1
+      this.loadData()
+    },
+    loadData(){
       this.loading = true
-      if(node){
-        this.params.folderId = node
-      }else {
-        this.params.folderId = 0;
+      this.params = {
+        ...this.params,
+        pageNo:this.pagination.current,
+        pageSize:this.pagination.pageSize
       }
       console.log(this.params)
       getDataModuleList(this.params).then((res) => {
@@ -178,6 +235,16 @@ export default {
         this.data = res.result.records
         this.pagination = pagination
       })
+    },
+    fetch(node) {
+      this.params=this.$options.data().params
+      this.pagination=this.$options.data().pagination
+      if(node){
+        this.params.folderId = node
+      }else {
+        this.params.folderId = 0;
+      }
+      this.loadData()
       // queryData({
       //   results: 10,
       //   ...params,

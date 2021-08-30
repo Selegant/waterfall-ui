@@ -16,7 +16,7 @@
                   <a-dropdown :trigger="['contextmenu']">
                     <span>{{ title }}</span>
                     <template #overlay>
-                      <a-menu @click="">
+                      <a-menu @click="({ key: menuKey }) => onContextMenuClick(treeKey, menuKey)">
                         <a-menu-item key="1">编辑</a-menu-item>
                         <a-menu-item key="2">删除</a-menu-item>
                       </a-menu>
@@ -58,7 +58,8 @@
 <script>
 import ModelType from './modules/ModelType'
 import ModelList from './modules/ModelList'
-import { getModelFolder } from '../../api/api'
+import { getModelFolder,deleteModelFolder } from '../../api/api'
+import { getFolderItem } from "@/utils/util"
 // const treeData = [
 //   {
 //     title: 'parent 1',
@@ -95,7 +96,8 @@ export default {
         },
         value: '0',
         children:[]
-      }]
+      }],
+      selectedKey:null
     }
   },
   mounted() {
@@ -119,8 +121,31 @@ export default {
       })
     },
     changeTreeNode(selectedKeys){
+      this.selectedKey = selectedKeys[0]
       console.log(selectedKeys)
       this.$refs.modelList.fetch(selectedKeys[0])
+    },
+    onContextMenuClick(treeKey, menuKey){
+      console.log(`treeKey: ${treeKey}, menuKey: ${menuKey}`);
+      if(menuKey == '1'){
+        // 编辑
+        let folderItem = getFolderItem('key',treeKey,this.treeData)
+        let {parentId,remark,title} = {...folderItem}
+        this.$refs.modelType.open({id:treeKey,folderName:title,remark,parentId})
+      }else{
+        // 删除
+        deleteModelFolder({id:treeKey}).then(async (res) =>{
+              if (res.success) {
+                await this.init()
+                if(this.selectedKey==treeKey){
+                  await this.$refs.modelList.fetch()
+                }
+                this.$message.success('删除成功')
+              } else {
+                this.$message.error(res.message)
+              }
+            })
+      }
     }
   }
 }
