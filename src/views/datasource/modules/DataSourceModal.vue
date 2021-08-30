@@ -59,6 +59,25 @@
           </a-form-model-item>
         </template>
 
+
+        <template>
+          <a-form-model-item v-if="model.dbType==HIVE" label="defaultfs" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="defaultfs">
+            <a-input placeholder="请输入defaultFs" v-model="model.defaultfs"  />
+          </a-form-model-item>
+        </template>
+
+        <template>
+          <a-form-model-item v-if="model.dbType==HIVE" label="path" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="path">
+            <a-input placeholder="请输入path" v-model="model.path"  />
+          </a-form-model-item>
+        </template>
+
+        <template>
+          <a-form-model-item v-if="model.dbType==HIVE" label="hadoopConfig" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="hadoopConfig">
+            <a-textarea placeholder="请输入hadoopConfig" v-model="model.hadoopConfig"  :auto-size="{ minRows: 4, maxRows: 8 }" />
+          </a-form-model-item>
+        </template>
+
 <!--        <template>-->
 <!--          <a-form-model-item label="JDBC_URL" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="jdbcUrl">-->
 <!--            <a-input placeholder="请输入数据库连接地址" v-model="model.jdbcUrl" @change="changeJdbcUrl" />-->
@@ -126,17 +145,20 @@
         userId:"", //保存用户id
         disableSubmit:false,
         dateFormat:"YYYY-MM-DD",
-        validatorRules:{
-          dataSourceName:[{required: true, message: '请输入数据源名称!'},
-                    {validator: this.validateDataSourceName,}],
-          dbType: [{required: true, message: '请输入数据库类型!'}],
-          jdbcUrl: [{required: true, message: '请重新输入数据库地址!'}],
-          host:[{ required: true, message: '请输入数据库Host!' }],
-          port: [{required: true, message: '请输入数据库端口号!'}],
-          dbName: [{required: true, message: '请输入数据库名!'}],
-          serverName: [{required: true, message: '请输入服务名!'}],
-          username:[{ required: false, message: '请输入用户名!' }],
-          password: [{required: false, message: '请输入密码!'}],
+        validatorRules: {
+          dataSourceName: [{ required: true, message: '请输入数据源名称!' },
+            { validator: this.validateDataSourceName, }],
+          dbType: [{ required: true, message: '请输入数据库类型!' }],
+          jdbcUrl: [{ required: true, message: '请重新输入数据库地址!' }],
+          host: [{ required: true, message: '请输入数据库Host!' }],
+          port: [{ required: true, message: '请输入数据库端口号!' }],
+          dbName: [{ required: true, message: '请输入数据库名!' }],
+          serverName: [{ required: true, message: '请输入服务名!' }],
+          username: [{ required: false, message: '请输入用户名!' }],
+          password: [{ required: false, message: '请输入密码!' }],
+          defaultfs: [{ required: true, message: '请输入defaultFs!' }],
+          path: [{ required: true, message: '请输入path!' }],
+          hadoopConfig: [{ required: true, message: '请输入hadoopConfig!' }, { validator: this.validateJSON }]
         },
         departIdShow:false,
         title:"操作",
@@ -328,20 +350,35 @@
       handleCancel () {
         this.close()
       },
-      validateDataSourceName(rule, value, callback){
+      validateDataSourceName(rule, value, callback) {
         var params = {
           tableName: 'waterfall_data_source',
           fieldName: 'data_source_name',
           fieldVal: value,
           dataId: this.userId
-        };
+        }
         duplicateCheck(params).then((res) => {
           if (res.success) {
-          callback()
-        } else {
-          callback("数据源名称已存在!")
+            callback()
+          } else {
+            callback('数据源名称已存在!')
+          }
+        })
+      },
+      validateJSON(rule, value, callback) {
+        if (typeof value == 'string') {
+          try {
+            let obj = JSON.parse(value)
+            if (typeof obj == 'object' && obj) {
+              callback()
+            } else {
+              callback('hadoopConfig请输入JSON对象!')
+            }
+          } catch (e) {
+            console.log('error：' + value + '!!!' + e)
+            callback('hadoopConfig请输入JSON对象!')
+          }
         }
-      })
       }
     }
   }

@@ -22,7 +22,7 @@
           <a href="https://github.com/zhangdaiscott/jeecg-boot/blob/master/LICENSE" target="_blank">条款</a>
         </div>
         <div class="copyright">
-          Copyright &copy; 2021 <a href="#" target="_blank">Selegant</a> 出品
+          Copyright &copy; 2021 <a href="#" target="_blank">华卓科技</a> 出品
         </div>
       </div>
     </div>

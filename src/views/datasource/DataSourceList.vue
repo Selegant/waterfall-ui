@@ -5,7 +5,7 @@
         <div style="margin-bottom: 20px">
           <a-card style="width: 300px;">
             <div style="text-align: center">
-              <a-button @click="handleAdd(params)" icon="plus" :size="large" type="link">新增数据源</a-button>
+              <a-button @click="handleAdd(params)" icon="plus" size="large" type="link">新增数据源</a-button>
             </div>
           </a-card>
         </div>
@@ -40,7 +40,7 @@
         <div style="margin-bottom: 20px">
           <a-card style="width: 300px;">
             <div style="text-align: center">
-              <a-button @click="handleAdd(params)" icon="plus" :size="large" type="link">新增数据源</a-button>
+              <a-button @click="handleAdd(params)" icon="plus" size="large" type="link">新增数据源</a-button>
             </div>
           </a-card>
         </div>
@@ -48,9 +48,9 @@
           <a-list-item slot="renderItem" slot-scope="item, index">
             <a-card :title="item.dataSourceName">
               <label>数据库类型：</label>
-              <a-tag v-if="item.dbType==MYSQL" color="#2db7f5"><div style="width: 40px;text-align: center">{{item.dbType}}</div></a-tag>
-              <a-tag v-if="item.dbType==ORACLE" color="#f50"><div style="width: 40px;text-align: center">{{item.dbType}}</div></a-tag>
-              <a-tag v-if="item.dbType==HIVE" color="#FCE92F"><div style="width: 40px;text-align: center;color:#333333">{{item.dbType}}</div></a-tag>
+              <a-tag v-if="item.dbType==MYSQL" color="#2db7f5"><div style="width: 50px;text-align: center">{{item.dbType}}</div></a-tag>
+              <a-tag v-if="item.dbType==ORACLE" color="#f50"><div style="width: 50px;text-align: center">{{item.dbType}}</div></a-tag>
+              <a-tag v-if="item.dbType==HIVE" color="#FCE92F"><div style="width: 50px;text-align: center;color:#333333">{{item.dbType}}</div></a-tag>
               <br/>
               <label>Host：</label><span>{{item.host}}</span><br/>
               <label>Port：</label><span>{{item.port}}</span><br/>
